@@ -1,2 +1,4 @@
 *.csv.gz
-*.csv
+lodes_od/
+lodes_rac/
+lodes_wac/
