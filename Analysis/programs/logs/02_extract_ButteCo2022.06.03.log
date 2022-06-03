@@ -1,0 +1,67 @@
+--------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\l
+> ogs/02_extract_ButteCo2022.06.03.log
+  log type:  text
+ opened on:   3 Jun 2022, 09:52:16
+
+. 
+. *Bring in Origin-Destination Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. insheet using $data/lodes_od/ca_od_main_JT00_2017.csv, double clear
+(13 vars, 15,396,268 obs)
+
+. 
+. *Convert geocodes to string variables
+. tostring w_geocode, replace format(%14.0f)
+w_geocode was double now str14
+
+. tostring h_geocode, replace format(%14.0f)
+h_geocode was double now str14
+
+. *Add a zero to be consistent with standard FIPS formatting
+. replace w_geocode="0"+w_geocode
+variable w_geocode was str14 now str15
+(15,396,268 real changes made)
+
+. replace h_geocode="0"+h_geocode
+variable h_geocode was str14 now str15
+(15,396,268 real changes made)
+
+. 
+. *Create county FIPS from first five digits of geocode
+. gen w_county=substr(w_geocode,1,5)
+
+. gen h_county=substr(h_geocode,1,5)
+
+. 
+. *Keep only Butte County (FIPS=06007)
+. keep if w_county=="06007" | h_county=="06007"
+(15,304,137 observations deleted)
+
+. 
+. save $data/lodes_od/od_main_JT00_2017.dta, replace
+(file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_od/od_
+    > main_JT00_2017.dta not found)
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_od/od_
+    > main_JT00_2017.dta saved
+
+. 
+end of do-file
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD4188_000000.tmp"
+
+. 
+. save $data/od_main_JT00_2017.dta, replace
+(file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00
+    > _2017.dta not found)
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00
+    > _2017.dta saved
+
+. 
+end of do-file
+
