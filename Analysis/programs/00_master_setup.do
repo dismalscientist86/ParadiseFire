@@ -15,7 +15,7 @@ set more off
 capture log close
 set seed 39281
 
-local today : di %tdCY.N.D date("$S_DATE", "DMY")
+global today : di %tdCY.N.D date("$S_DATE", "DMY")
 
 if c(username)=="sandl305"{
 	global programs "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs"

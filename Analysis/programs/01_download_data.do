@@ -6,9 +6,14 @@
 *do that from within Stata (running on Windows)
 *Created by: Dani Sandler
 *Created on: 5/27/2022
-*Modifications: 
+*Modifications: 6/3/22 - DHS - Add dated log file
 ******************************/
+clear
+capture log close
+
 do 00_master_setup.do
+
+log using $logs/01_download_data$today.log, replace
 
 *Just download 2017, 2018, and 2019 data for now. Can expand loop if want more years.
 forvalues yr=2017/2019{
