@@ -24,4 +24,6 @@ if c(username)=="sandl305"{
 	global logs "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs"
 }
 
+
+
 cd $programs

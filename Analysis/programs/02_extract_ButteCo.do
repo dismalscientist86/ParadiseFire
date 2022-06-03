@@ -13,7 +13,7 @@ do 00_master_setup.do
 
 log using $logs/02_extract_ButteCo$today.log, replace
 
-*Bring in Origin-Destination Main dataset, for All Jobs (JT00)
+*Bring in 2017 Origin-Destination Main dataset, for All Jobs (JT00)
 *Make sure to bring in as double so it doesn't round the geocode variables
 insheet using $data/lodes_od/ca_od_main_JT00_2017.csv, double clear
 
@@ -31,4 +31,5 @@ gen h_county=substr(h_geocode,1,5)
 *Keep only Butte County (FIPS=06007)
 keep if w_county=="06007" | h_county=="06007"
 
-save $data/lodes_od/od_main_JT00_2017.dta, replace
+save $data/od_main_JT00_2017.dta, replace
+

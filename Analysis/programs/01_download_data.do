@@ -17,7 +17,7 @@ log using $logs/01_download_data$today.log, replace
 
 *Just download 2017, 2018, and 2019 data for now. Can expand loop if want more years.
 forvalues yr=2017/2019{
-	forvalues i=0/5{
+	forvalues i=0/1{
 		quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/ca/od/ca_od_main_JT0`i'_`yr'.csv.gz $data/lodes_od/ca_od_main_JT0`i'_`yr'.csv.gz, replace
 		quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/ca/od/ca_od_aux_JT0`i'_`yr'.csv.gz $data/lodes_od/ca_od_aux_JT0`i'_`yr'.csv.gz, replace
 		
