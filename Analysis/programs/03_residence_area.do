@@ -20,14 +20,6 @@ replace year=2018 if missing(year)
 append using $data/rac_S000_JT00_2019.dta
 replace year=2019 if missing(year)
 
-*We will hopefully have a full list of geocodes soon, but here are 5 to work with for now
-gen paradise=0
-replace paradise=1 if h_geocode=="060070020001007"
-replace paradise=1 if h_geocode=="060070019003001"
-replace paradise=1 if h_geocode=="060070021001002"
-replace paradise=1 if h_geocode=="060070022001006"
-replace paradise=1 if h_geocode=="060070020002000"
-
 *I think Paradise Census Tracts are tracts 18,19, 20, 21 within Butte County
 gen h_tract=substr(h_geocode,1,9)
 
