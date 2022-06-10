@@ -1,6 +1,6 @@
 /***************************************
-*Filename: 03_residence_area.do
-*Purpose: This program appends the three years of residence areas,
+*Filename: 04_work_area.do
+*Purpose: This program appends the three years of workplace areas,
 *	applies the "Paradise" dummy and other data cleaning tasks
 *Created on: 6/10/2022
 *Created by: Dani Sandler
@@ -11,23 +11,23 @@ capture log close
 
 do 00_master_setup.do
 
-log using $logs/03_residence_area$today.log, replace
+log using $logs/04_work_area$today.log, replace
 
-use $data/rac_S000_JT00_2017.dta, clear
+use $data/wac_S000_JT00_2017.dta, clear
 gen year=2017
-append using $data/rac_S000_JT00_2018.dta
+append using $data/wac_S000_JT00_2018.dta
 replace year=2018 if missing(year)
-append using $data/rac_S000_JT00_2019.dta
+append using $data/wac_S000_JT00_2019.dta
 replace year=2019 if missing(year)
 
 *I think Paradise Census Tracts are tracts 18,19, 20, 21 within Butte County
-gen h_tract=substr(h_geocode,1,9)
+gen w_tract=substr(w_geocode,1,9)
 
 gen paradise=0
-replace paradise=1 if h_tract=="060070018"
-replace paradise=1 if h_tract=="060070019"
-replace paradise=1 if h_tract=="060070020"
-replace paradise=1 if h_tract=="060070021"
+replace paradise=1 if w_tract=="060070018"
+replace paradise=1 if w_tract=="060070019"
+replace paradise=1 if w_tract=="060070020"
+replace paradise=1 if w_tract=="060070021"
 
 graph bar (sum) c000 if paradise==1, over(year)
 

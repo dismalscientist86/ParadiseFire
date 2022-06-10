@@ -87,3 +87,19 @@
 . 
 end of do-file
 
+. graph twoway (connected c000 year if paradise==1, yaxis(1) ) (connected c000 year if paradise==0
+> , yaxis(2)), xlabel(2017(1)2019) legend(label(1 "Paradise") label(2 "Rest of Butte County"))
+
+. do "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\04_work_area.do"
+
+. /***************************************
+> *Filename: 04_work_area.do
+> *Purpose: This program appends the three years of workplace areas,
+> *       applies the "Paradise" dummy and other data cleaning tasks
+> *Created on: 6/10/2022
+> *Created by: Dani Sandler
+> *Modifications:
+> ***************************************/
+. clear
+
+. capture log close

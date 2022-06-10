@@ -1,0 +1,72 @@
+--------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs/04_work_area20
+> 22.06.10.log
+  log type:  text
+ opened on:  10 Jun 2022, 16:10:21
+
+. 
+. use $data/wac_S000_JT00_2017.dta, clear
+
+. gen year=2017
+
+. append using $data/wac_S000_JT00_2018.dta
+
+. replace year=2018 if missing(year)
+(1,963 real changes made)
+
+. append using $data/wac_S000_JT00_2019.dta
+(variable cns15 was int, now long to accommodate using data's values)
+(variable cd04 was int, now long to accommodate using data's values)
+
+. replace year=2019 if missing(year)
+(1,898 real changes made)
+
+. 
+. *I think Paradise Census Tracts are tracts 18,19, 20, 21 within Butte County
+. gen w_tract=substr(w_geocode,1,9)
+
+. 
+. gen paradise=0
+
+. replace paradise=1 if w_tract=="060070018"
+(122 real changes made)
+
+. replace paradise=1 if w_tract=="060070019"
+(60 real changes made)
+
+. replace paradise=1 if w_tract=="060070020"
+(90 real changes made)
+
+. replace paradise=1 if w_tract=="060070021"
+(111 real changes made)
+
+. 
+. graph bar (sum) c000 if paradise==1, over(year)
+
+. 
+. *To make line graphs, it is easiest to collapse down to one observation per location (Paradise/N
+> ot Paradise) per year
+. drop createdate
+
+. *All count variables start with c, so can use c* to include everything
+. collapse (sum) c*, by(paradise year)
+
+. 
+. *Two Y-axes are not ideal, but necessary to get Paradise and Not Paradise on the same graph
+. graph twoway (connected c000 year if paradise==1, yaxis(1) ) (connected c000 year if paradise==0
+> , yaxis(2)), xlabel(2017(1)2019) legend(label(1 "Paradise") label(2 "Rest of Butte County"))
+
+. 
+. *Percentage change to get them on same scale without playing with the axes
+. bysort paradise: egen c000_2017=max(c000*(year==2017))
+
+. gen c000_pctchg=(c000-c000_2017)/c000_2017
+
+. 
+. graph twoway (connected c000_pctchg year if paradise==1) (connected c000_pctchg year if paradise
+> ==0), xlabel(2017(1)2019) legend(label(1 "Paradise") label(2 "Rest of Butte County"))
+
+. 
+end of do-file
+
