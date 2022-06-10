@@ -3,7 +3,7 @@
        log:  C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs/02_extract_But
 > teCo2022.06.10.log
   log type:  text
- opened on:  10 Jun 2022, 07:14:24
+ opened on:  10 Jun 2022, 10:19:30
 
 . 
 . *Bring in Origin-Destination Main dataset, for All Jobs (JT00)
@@ -44,8 +44,6 @@ variable w_geocode was str14 now str15
 variable h_geocode was str14 now str15
 (15,688,804 real changes made)
 (15,594,932 observations deleted)
-(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2018.dta not
-    found)
 file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2018.dta saved
 (13 vars, 15,821,583 obs)
 w_geocode was double now str14
@@ -55,9 +53,274 @@ variable w_geocode was str14 now str15
 variable h_geocode was str14 now str15
 (15,821,583 real changes made)
 (15,731,505 observations deleted)
-(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2019.dta not
-    found)
 file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2019.dta saved
+
+. 
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_od/ca_rac_main_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/rac_main_JT00_`i'.dta, replace
+ 11. }
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_od/ca_rac_main_JT00_2017
+    > .csv not found
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_od/ca_rac_main_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/rac_main_JT00_`i'.dta, replace
+ 11. }
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_od/ca_rac_main_JT00_2017
+    > .csv not found
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_od/ca_rac_main_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/rac_main_JT00_`i'.dta, replace
+ 11. }
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_od/ca_rac_main_JT00_2017
+    > .csv not found
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_rac/ca_rac_main_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/rac_main_JT00_`i'.dta, replace
+ 11. }
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_rac/ca_rac_main_JT00_201
+    > 7.csv not found
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_rac/ca_rac_main_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/rac_main_JT00_`i'.dta, replace
+ 11. }
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_rac/ca_rac_main_JT00_201
+    > 7.csv not found
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_rac/ca_rac_S000_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/rac_S000_JT00_`i'.dta, replace
+ 11. }
+file
+    C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/lodes_rac/ca_rac_S000_JT00_201
+    > 7.csv not found
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_rac/ca_rac_S000_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/rac_S000_JT00_`i'.dta, replace
+ 11. }
+(43 vars, 386,294 obs)
+variable w_geocode not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_rac/ca_rac_S000_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring h_geocode, replace format(%14.0f)
+  4.         *Add a zero to be consistent with standard FIPS formatting
+.         replace h_geocode="0"+h_geocode
+  5. 
+.         *Create county FIPS from first five digits of geocode
+.         gen h_county=substr(h_geocode,1,5)
+  6. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if h_county=="06007"
+  7. 
+.         save $data/rac_S000_JT00_`i'.dta, replace
+  8. }
+(43 vars, 386,294 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(386,294 real changes made)
+(382,838 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2017.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2017.dta saved
+(43 vars, 386,641 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(386,641 real changes made)
+(383,168 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2018.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2018.dta saved
+(43 vars, 386,527 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(386,527 real changes made)
+(383,098 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2019.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2019.dta saved
 
 . 
 end of do-file
