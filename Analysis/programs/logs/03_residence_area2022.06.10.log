@@ -3,7 +3,7 @@
        log:  C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs/03_residence_a
 > rea2022.06.10.log
   log type:  text
- opened on:  10 Jun 2022, 11:11:08
+ opened on:  10 Jun 2022, 11:36:50
 
 . 
 . use $data/rac_S000_JT00_2017.dta, clear
@@ -41,91 +41,46 @@
 (3 real changes made)
 
 . 
+. *I think Paradise Census Tracts are tracts 18,19, 20, 21 within Butte County
+. gen h_tract=substr(h_geocode,1,9)
+
+. 
+. replace paradise=1 if h_tract=="060070018"
+(200 real changes made)
+
+. replace paradise=1 if h_tract=="060070019"
+(87 real changes made)
+
+. replace paradise=1 if h_tract=="060070020"
+(154 real changes made)
+
+. replace paradise=1 if h_tract=="060070021"
+(169 real changes made)
+
+. 
 . graph bar (sum) c000 if paradise==1, over(year)
 
 . 
 . *To make line graphs, it is easiest to collapse down to one observation per location (Paradise/N
 > ot Paradise) per year
-. collapse (sum) c000 ca* ce* cns* cr* ct* cd* cs*, by(paradise year)
+. drop createdate
+
+. *All count variables start with c, so can use c* to include everything
+. collapse (sum) c*, by(paradise year)
 
 . 
-. 
-end of do-file
-
-. graph twoway connected c000 year if paradise==1
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
-. graph twoway (connected c000 year if paradise==1) (connected c000 year if paradise==0)
-
-. 
-end of do-file
-
-. graph twoway help
-help is not a twoway plot type
-r(198);
-
-. help graph twoway
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
+. *Two Y-axes are not ideal, but necessary to get Paradise and Not Paradise on the same graph, at 
+> least while using the 5 geocodes
 . graph twoway (connected c000 year if paradise==1, yaxis(1) ) (connected c000 year if paradise==0
-> , yaxis(2))
+> , yaxis(2)), xlabel(2017(1)2019) legend(label(1 "Paradise") label(2 "Rest of Butte County"))
 
 . 
-end of do-file
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
-. graph twoway (connected c000 year if paradise==1, yaxis(1) ) (connected c000 year if paradise==0
-> , yaxis(2)), xscale(2017(1)2019)
-option 2017() not allowed
-r(198);
-
-end of do-file
-
-r(198);
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
-. graph twoway (connected c000 year if paradise==1, yaxis(1) ) (connected c000 year if paradise==0
-> , yaxis(2)), xlabel(2017(1)2019)
-
-. 
-end of do-file
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
 . *Percentage change to get them on same scale without playing with the axes
 . bysort paradise: egen c000_2017=max(c000*(year==2017))
 
 . gen c000_pctchg=(c000-c000_2017)/c000_2017
 
 . 
-. graph twoway (connected c000_pctchg year if paradise==1) (connected c000_pctchg year if paradise
-> ==0), xlabel(2017(1)2019)
-
-. 
-end of do-file
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
-. graph twoway (connected c000 year if paradise==1, yaxis(1) ) (connected c000 year if paradise==0
-> , yaxis(2)), xlabel(2017(1)2019) legend(label(1 "Paradise" 2 "Rest of Butte County"))
-
-. 
-end of do-file
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
-. graph twoway (connected c000 year if paradise==1, yaxis(1) ) (connected c000 year if paradise==0
-> , yaxis(2)), xlabel(2017(1)2019) legend(label(1 "Paradise") label(2 "Rest of Butte County"))
-
-. 
-end of do-file
-
-. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
-
 . graph twoway (connected c000_pctchg year if paradise==1) (connected c000_pctchg year if paradise
 > ==0), xlabel(2017(1)2019) legend(label(1 "Paradise") label(2 "Rest of Butte County"))
 

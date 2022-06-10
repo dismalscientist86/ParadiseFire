@@ -28,6 +28,14 @@ replace paradise=1 if h_geocode=="060070021001002"
 replace paradise=1 if h_geocode=="060070022001006"
 replace paradise=1 if h_geocode=="060070020002000"
 
+*I think Paradise Census Tracts are tracts 18,19, 20, 21 within Butte County
+gen h_tract=substr(h_geocode,1,9)
+
+replace paradise=1 if h_tract=="060070018"
+replace paradise=1 if h_tract=="060070019"
+replace paradise=1 if h_tract=="060070020"
+replace paradise=1 if h_tract=="060070021"
+
 graph bar (sum) c000 if paradise==1, over(year)
 
 *To make line graphs, it is easiest to collapse down to one observation per location (Paradise/Not Paradise) per year
