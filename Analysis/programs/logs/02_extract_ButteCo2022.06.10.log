@@ -325,3 +325,106 @@ file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00
 . 
 end of do-file
 
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Work Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_wac/ca_wac_S000_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/wac_S000_JT00_`i'.dta, replace
+ 11. }
+(53 vars, 252,387 obs)
+w_geocode was double now str14
+variable h_geocode not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\sandl305\AppData\Local\Temp\STD344c_000000.tmp"
+
+. *Bring in Work Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2017/2019{
+  2.         insheet using $data/lodes_wac/ca_wac_S000_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  5.         
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  6.         
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" 
+  7. 
+.         save $data/wac_S000_JT00_`i'.dta, replace
+  8. }
+(53 vars, 252,387 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(252,387 real changes made)
+(250,474 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2017.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2017.dta saved
+(53 vars, 256,232 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(256,232 real changes made)
+(254,269 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2018.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2018.dta saved
+(53 vars, 259,675 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(259,675 real changes made)
+(257,777 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2019.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2019.dta saved
+
+. 
+end of do-file
+
+. browse if w_geocode=="060070020001007"
+
+. tab createdate
+
+ createdate |      Freq.     Percent        Cum.
+------------+-----------------------------------
+   2.02e+07 |      1,898      100.00      100.00
+------------+-----------------------------------
+      Total |      1,898      100.00
+
+. do "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\03_residence_area.do"
+
+. /***************************************
+> *Filename: 03_residence_area.do
+> *Purpose: This program appends the three years of residence areas,
+> *       applies the "Paradise" dummy and other data cleaning tasks
+> *Created on: 6/10/2022
+> *Created by: Dani Sandler
+> *Modifications:
+> ***************************************/
+. clear
+
+. capture log close
