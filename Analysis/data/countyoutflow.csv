@@ -1,0 +1,41 @@
+year,y1_statefips,y1_countyfips,y2_statefips,y2_countyfips,y2_state,y2_countyname,Number returns,Number exemptions,agi
+2019-2020,6,7,96,0,CA,Butte County Total Migration-US and Foreign,5748,10207,288581
+2019-2020,6,7,97,0,CA,Butte County Total Migration-US,5748,10207,288581
+2019-2020,6,7,97,1,CA,Butte County Total Migration-Same State,3459,5825,156272
+2019-2020,6,7,97,3,CA,Butte County Total Migration-Different State,2289,4382,132309
+2019-2020,6,7,6,7,CA,Butte County Non-migrants,68090,141916,4789905
+2018-2019,6,7,96,0,CA,Butte County Total Migration-US and Foreign,8292,14647,435017
+2018-2019,6,7,97,0,CA,Butte County Total Migration-US,8292,14647,435017
+2018-2019,6,7,97,1,CA,Butte County Total Migration-Same State,5399,9292,277303
+2018-2019,6,7,97,3,CA,Butte County Total Migration-Different State,2893,5355,157714
+2018-2019,6,7,6,7,CA,Butte County Non-migrants,69296,142520,4853224
+2017-2018,6,7,96,0,CA,Butte County Total Migration-US and Foreign,6247,10622,304738
+2017-2018,6,7,97,0,CA,Butte County Total Migration-US,6247,10622,304738
+2017-2018,6,7,97,1,CA,Butte County Total Migration-Same State,4425,7396,209997
+2017-2018,6,7,97,3,CA,Butte County Total Migration-Different State,1822,3226,94742
+2017-2018,6,7,98,0,CA,Butte County Total Migration-Foreign,-1,-1,-1
+2017-2018,6,7,6,7,CA,Butte County Non-migrants,72701,150191,4697236
+2016-2017,6,7,96,0,CA,Butte County Total Migration-US and Foreign,5433,9275,234002
+2016-2017,6,7,97,0,CA,Butte County Total Migration-US,5433,9275,234002
+2016-2017,6,7,97,1,CA,Butte County Total Migration-Same State,3531,5849,145264
+2016-2017,6,7,97,3,CA,Butte County Total Migration-Different State,1902,3426,88738
+2016-2017,6,7,98,0,CA,Butte County Total Migration-Foreign,-1,-1,-1
+2016-2017,6,7,6,7,CA,Butte County Non-migrants,71825,149133,4431612
+2015-2016,6,7,96,0,CA,Butte County Total Migration-US and Foreign,4347,7382,188145
+2015-2016,6,7,97,0,CA,Butte County Total Migration-US,4324,7346,187328
+2015-2016,6,7,97,1,CA,Butte County Total Migration-Same State,2873,4696,124103
+2015-2016,6,7,97,3,CA,Butte County Total Migration-Different State,1451,2650,63225
+2015-2016,6,7,98,0,CA,Butte County Total Migration-Foreign,23,36,818
+2015-2016,6,7,6,7,CA,Butte County Non-migrants,71682,150045,4417550
+2014-2015,6,7,96,0,CA,Butte County Total Migration-US and Foreign,3062,5165,118104
+2014-2015,6,7,97,0,CA,Butte County Total Migration-US,3032,5118,116753
+2014-2015,6,7,97,1,CA,Butte County Total Migration-Same State,2130,3562,76634
+2014-2015,6,7,97,3,CA,Butte County Total Migration-Different State,902,1556,40119
+2014-2015,6,7,98,0,CA,Butte County Total Migration-Foreign,30,47,1350
+2014-2015,6,7,6,7,CA,Butte County Non-migrants,71306,150536,4216640
+2013-2014,6,7,96,0,CA,Butte County Total Migration-US and Foreign,3988,7017,150560
+2013-2014,6,7,97,0,CA,Butte County Total Migration-US,3988,7017,150560
+2013-2014,6,7,97,1,CA,Butte County Total Migration-Same State,2704,4661,100687
+2013-2014,6,7,97,3,CA,Butte County Total Migration-Different State,1284,2356,49873
+2013-2014,6,7,98,0,CA,Butte County Total Migration-Foreign,-1,-1,-1
+2013-2014,6,7,6,7,CA,Butte County Non-migrants,69824,148702,3867954
