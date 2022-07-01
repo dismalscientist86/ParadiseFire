@@ -22,7 +22,17 @@ if c(username)=="sandl305"{
 	global data "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data"
 	global output "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\"
 	global logs "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs"
+	global graphs "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\graphs"
 }
+
+if c(username)!="sandl305"{
+	global programs "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs"
+	global data "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\data"
+	global output "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis"
+	global logs "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs\logs"
+	global graphs "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\graphs"
+}
+
 
 
 
