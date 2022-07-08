@@ -1,0 +1,243 @@
+--------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs/02_extract_But
+> teCo2022.07.08.log
+  log type:  text
+ opened on:   8 Jul 2022, 16:23:55
+
+. 
+. *Bring in Origin-Destination Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2013/2019{
+  2.         insheet using $data/lodes_od/ca_od_main_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         tostring h_geocode, replace format(%14.0f)
+  5.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  6.         replace h_geocode="0"+h_geocode
+  7. 
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  8.         gen h_county=substr(h_geocode,1,5)
+  9. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" | h_county=="06007"
+ 10. 
+.         save $data/od_main_JT00_`i'.dta, replace
+ 11. }
+(13 vars, 13,645,807 obs)
+w_geocode was double now str14
+h_geocode was double now str14
+variable w_geocode was str14 now str15
+(13,645,807 real changes made)
+variable h_geocode was str14 now str15
+(13,645,807 real changes made)
+(13,561,762 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2013.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2013.dta saved
+(13 vars, 14,099,013 obs)
+w_geocode was double now str14
+h_geocode was double now str14
+variable w_geocode was str14 now str15
+(14,099,013 real changes made)
+variable h_geocode was str14 now str15
+(14,099,013 real changes made)
+(14,012,781 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2014.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2014.dta saved
+(13 vars, 14,713,690 obs)
+w_geocode was double now str14
+h_geocode was double now str14
+variable w_geocode was str14 now str15
+(14,713,690 real changes made)
+variable h_geocode was str14 now str15
+(14,713,690 real changes made)
+(14,625,281 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2015.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2015.dta saved
+(13 vars, 15,172,222 obs)
+w_geocode was double now str14
+h_geocode was double now str14
+variable w_geocode was str14 now str15
+(15,172,222 real changes made)
+variable h_geocode was str14 now str15
+(15,172,222 real changes made)
+(15,081,523 observations deleted)
+(file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2016.dta not
+    found)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2016.dta saved
+(13 vars, 15,396,268 obs)
+w_geocode was double now str14
+h_geocode was double now str14
+variable w_geocode was str14 now str15
+(15,396,268 real changes made)
+variable h_geocode was str14 now str15
+(15,396,268 real changes made)
+(15,304,137 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2017.dta saved
+(13 vars, 15,688,804 obs)
+w_geocode was double now str14
+h_geocode was double now str14
+variable w_geocode was str14 now str15
+(15,688,804 real changes made)
+variable h_geocode was str14 now str15
+(15,688,804 real changes made)
+(15,594,932 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2018.dta saved
+(13 vars, 15,821,583 obs)
+w_geocode was double now str14
+h_geocode was double now str14
+variable w_geocode was str14 now str15
+(15,821,583 real changes made)
+variable h_geocode was str14 now str15
+(15,821,583 real changes made)
+(15,731,505 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/od_main_JT00_2019.dta saved
+
+. 
+. *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2013/2019{
+  2.         insheet using $data/lodes_rac/ca_rac_S000_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring h_geocode, replace format(%14.0f)
+  4.         *Add a zero to be consistent with standard FIPS formatting
+.         replace h_geocode="0"+h_geocode
+  5. 
+.         *Create county FIPS from first five digits of geocode
+.         gen h_county=substr(h_geocode,1,5)
+  6. 
+.         *Keep only Butte County (FIPS=06007)
+.         keep if h_county=="06007"
+  7. 
+.         save $data/rac_S000_JT00_`i'.dta, replace
+  8. }
+(43 vars, 380,996 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(380,996 real changes made)
+(377,624 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2013.dta saved
+(43 vars, 381,433 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(381,433 real changes made)
+(378,078 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2014.dta saved
+(43 vars, 385,893 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(385,893 real changes made)
+(382,455 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2015.dta saved
+(43 vars, 386,228 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(386,228 real changes made)
+(382,783 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2016.dta saved
+(43 vars, 386,294 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(386,294 real changes made)
+(382,838 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2017.dta saved
+(43 vars, 386,641 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(386,641 real changes made)
+(383,168 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2018.dta saved
+(43 vars, 386,527 obs)
+h_geocode was double now str14
+variable h_geocode was str14 now str15
+(386,527 real changes made)
+(383,098 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/rac_S000_JT00_2019.dta saved
+
+. 
+. 
+. *Bring in Work Area Characteristics Main dataset, for All Jobs (JT00)
+. *Make sure to bring in as double so it doesn't round the geocode variables
+. forvalues i=2013/2019{
+  2.         insheet using $data/lodes_wac/ca_wac_S000_JT00_`i'.csv, double clear
+  3. 
+.         *Convert geocodes to string variables
+.         tostring w_geocode, replace format(%14.0f)
+  4.         *Add a zero to be consistent with standard FIPS formatting
+.         replace w_geocode="0"+w_geocode
+  5.         
+.         *Create county FIPS from first five digits of geocode
+.         gen w_county=substr(w_geocode,1,5)
+  6.         
+.         *Keep only Butte County (FIPS=06007)
+.         keep if w_county=="06007" 
+  7. 
+.         save $data/wac_S000_JT00_`i'.dta, replace
+  8. }
+(53 vars, 237,762 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(237,762 real changes made)
+(235,939 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2013.dta saved
+(53 vars, 240,526 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(240,526 real changes made)
+(238,693 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2014.dta saved
+(53 vars, 243,462 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(243,462 real changes made)
+(241,573 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2015.dta saved
+(53 vars, 248,718 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(248,718 real changes made)
+(246,806 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2016.dta saved
+(53 vars, 252,387 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(252,387 real changes made)
+(250,474 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2017.dta saved
+(53 vars, 256,232 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(256,232 real changes made)
+(254,269 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2018.dta saved
+(53 vars, 259,675 obs)
+w_geocode was double now str14
+variable w_geocode was str14 now str15
+(259,675 real changes made)
+(257,777 observations deleted)
+file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data/wac_S000_JT00_2019.dta saved
+
+. 
+end of do-file
+
+. do "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\04_work_area.do"
+
+. /***************************************
+> *Filename: 04_work_area.do
+> *Purpose: This program appends the three years of workplace areas,
+> *       applies the "Paradise" dummy and other data cleaning tasks
+> *Created on: 6/10/2022
+> *Created by: Dani Sandler
+> *Modifications:7/1/22 - GL - Added data from 2013 tp 2016
+>                                                         *Added percent change varibles 
+> ***************************************/
+. clear
+
+. capture log close

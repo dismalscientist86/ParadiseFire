@@ -12,36 +12,45 @@ if c(username)!="sandl305"{
 *create difference in difference variable
 gen did = (year>2017)*paradise 
 
-*control varibales 
-gen age_pwork = ca02/c000
-gen ed_hsplus = (cd02+cd03)/c000
-gen ed_college = cd04/c000
-gen p_female = cs02/c000
+*control variables (2017 levels)
+bysort w_geocode: egen c000_2017=max(c000*(year==2017))
+bysort w_geocode: egen ca02_2017=max(ca02*(year==2017))
+bysort w_geocode: egen cd02_2017=max(cd02*(year==2017))
+bysort w_geocode: egen cd03_2017=max(cd03*(year==2017))
+bysort w_geocode: egen cd04_2017=max(cd04*(year==2017))
+bysort w_geocode: egen cs02_2017=max(cs02*(year==2017))
+gen age_pwork = ca02_2017/c000_2017
+gen ed_hsplus = (cd02_2017+cd03_2017)/c000_2017
+gen ed_college = cd04_2017/c000_2017
+gen p_female = cs02_2017/c000_2017
 
 *run regressions (total jobs)
-reg c000 paradise did i.year, r
-reg c000 paradise did i.year age_pwork ed_hsplus ed_college p_female, r
+reg c000 did paradise i.year, r
+eststo all: reg c000 did paradise i.year age_pwork ed_hsplus ed_college p_female, r
 
 
 ****Run regressions per industry 
 *Construction
-reg cns04 paradise did i.year age_pwork ed_hsplus ed_college p_female, r
+eststo const: reg cns04 did paradise i.year age_pwork ed_hsplus ed_college p_female, r
 *Retail Trade 
-reg cns07 paradise did i.year age_pwork ed_hsplus ed_college p_female, r
+eststo retail: reg cns07 did paradise i.year age_pwork ed_hsplus ed_college p_female, r
 *Educational Services
-reg cns15 paradise did i.year age_pwork ed_hsplus ed_college p_female, r 
+eststo edu: reg cns15 did paradise i.year age_pwork ed_hsplus ed_college p_female, r 
 *Health Care & Social Assistance 
-reg cns16 paradise did i.year age_pwork ed_hsplus ed_college p_female, r
+eststo health: reg cns16 did paradise i.year age_pwork ed_hsplus ed_college p_female, r
 *Accomodation & Food Services 
-reg cns18 paradise did i.year age_pwork ed_hsplus ed_college p_female, r
+eststo food: reg cns18 did paradise i.year age_pwork ed_hsplus ed_college p_female, r
 *Public Administration 
-reg cns20 paradise did i.year age_pwork ed_hsplus ed_college p_female, r
+eststo public: reg cns20 did paradise i.year age_pwork ed_hsplus ed_college p_female, r
 
 ****Run regressions per earnings 
 *$1,250 or less
-reg ce01 paradise did i.year age_pwork ed_hsplus ed_college  p_female, r
+eststo low: reg ce01 did paradise i.year age_pwork ed_hsplus ed_college  p_female, r
 *$1,251 to $3,333
-reg ce02 paradise did i.year age_pwork ed_hsplus ed_college  p_female, r
+eststo medium: reg ce02 did paradise i.year age_pwork ed_hsplus ed_college  p_female, r
 *more than $3,333
-reg ce03 paradise did i.year age_pwork ed_hsplus ed_college p_female, r
+eststo high: reg ce03 did paradise i.year age_pwork ed_hsplus ed_college p_female, r
 
+esttab all const retail edu health food public using $output\tables\industry.csv, replace nonum drop(*year) mtitles("All" "Construction" "Retail" "Education" "Healthcare" "Accomodation & Food" "Public Administration") varlabel(paradise "Paradise" did "Post-Fire" age_pwork "% Prime-Age" ed_hsplus "% High School" ed_college "% College" p_female "% Female" )
+
+esttab all low medium high using $output\tables\earnings.csv, replace nonum drop(*year) mtitles("All" "Low Earnings" "Medium Earnings" "High Earnings") varlabel(paradise "Paradise" did "Post-Fire" age_pwork "% Prime-Age" ed_hsplus "% High School" ed_college "% College" p_female "% Female" )

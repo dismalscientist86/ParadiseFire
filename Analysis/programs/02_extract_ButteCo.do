@@ -17,7 +17,7 @@ log using $logs/02_extract_ButteCo$today.log, replace
 
 *Bring in Origin-Destination Main dataset, for All Jobs (JT00)
 *Make sure to bring in as double so it doesn't round the geocode variables
-forvalues i=2017/2019{
+forvalues i=2013/2019{
 	insheet using $data/lodes_od/ca_od_main_JT00_`i'.csv, double clear
 
 	*Convert geocodes to string variables
@@ -39,7 +39,7 @@ forvalues i=2017/2019{
 
 *Bring in Residential Area Characteristics Main dataset, for All Jobs (JT00)
 *Make sure to bring in as double so it doesn't round the geocode variables
-forvalues i=2017/2019{
+forvalues i=2013/2019{
 	insheet using $data/lodes_rac/ca_rac_S000_JT00_`i'.csv, double clear
 
 	*Convert geocodes to string variables
@@ -59,7 +59,7 @@ forvalues i=2017/2019{
 
 *Bring in Work Area Characteristics Main dataset, for All Jobs (JT00)
 *Make sure to bring in as double so it doesn't round the geocode variables
-forvalues i=2017/2019{
+forvalues i=2013/2019{
 	insheet using $data/lodes_wac/ca_wac_S000_JT00_`i'.csv, double clear
 
 	*Convert geocodes to string variables
