@@ -1,0 +1,91 @@
+--------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\l
+> ogs/01_download_data2023.03.07.log
+  log type:  text
+ opened on:   7 Mar 2023, 10:29:20
+
+. 
+. *Just download 2013-2019 data.
+. forvalues yr=2013/2019{
+  2.         forvalues i=0/1{
+  3.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/od/ca_od_main_JT0`i'_`yr'.csv.gz $data/lodes_od/ca_od_main_JT0`i'_`yr'.csv.
+> gz, replace
+  4.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/od/ca_od_aux_JT0`i'_`yr'.csv.gz $data/lodes_od/ca_od_aux_JT0`i'_`yr'.csv.gz
+> , replace
+  5.                 
+.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/ca/
+> rac/ca_rac_S000_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_S000_JT0`i'_`yr'.csv
+> .gz, replace
+  6.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SA01_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SA01_JT0`i'_`yr'.
+> csv.gz, replace
+  7.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SA02_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SA02_JT0`i'_`yr'.
+> csv.gz, replace
+  8.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SA03_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SA03_JT0`i'_`yr'.
+> csv.gz, replace
+  9.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SE01_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SE01_JT0`i'_`yr'.
+> csv.gz, replace
+ 10.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SE02_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SE02_JT0`i'_`yr'.
+> csv.gz, replace
+ 11.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SE03_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SE03_JT0`i'_`yr'.
+> csv.gz, replace
+ 12.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SI01_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SI01_JT0`i'_`yr'.
+> csv.gz, replace
+ 13.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SI02_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SI02_JT0`i'_`yr'.
+> csv.gz, replace
+ 14.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/rac/ca_rac_SI03_JT0`i'_`yr'.csv.gz $data/lodes_rac/ca_rac_SI03_JT0`i'_`yr'.
+> csv.gz, replace
+ 15.                 
+.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/ca/
+> wac/ca_wac_S000_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_S000_JT0`i'_`yr'.csv
+> .gz, replace
+ 16.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SA01_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SA01_JT0`i'_`yr'.
+> csv.gz, replace
+ 17.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SA02_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SA02_JT0`i'_`yr'.
+> csv.gz, replace
+ 18.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SA03_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SA03_JT0`i'_`yr'.
+> csv.gz, replace
+ 19.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SE01_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SE01_JT0`i'_`yr'.
+> csv.gz, replace
+ 20.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SE02_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SE02_JT0`i'_`yr'.
+> csv.gz, replace
+ 21.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SE03_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SE03_JT0`i'_`yr'.
+> csv.gz, replace
+ 22.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SI01_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SI01_JT0`i'_`yr'.
+> csv.gz, replace
+ 23.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SI02_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SI02_JT0`i'_`yr'.
+> csv.gz, replace
+ 24.                 quietly copy https://lehd.ces.census.gov/data/lodes/LODES7/
+> ca/wac/ca_wac_SI03_JT0`i'_`yr'.csv.gz $data/lodes_wac/ca_wac_SI03_JT0`i'_`yr'.
+> csv.gz, replace
+ 25.                 
+.         }
+ 26. }
+--Break--
+r(1);
+
+end of do-file
+
+--Break--
+r(1);
+
+. exit, clear
