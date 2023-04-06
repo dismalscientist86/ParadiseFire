@@ -92,9 +92,37 @@ for i in range(2013,2021):
     df.to_csv(os.path.join(data_wac, f"wac_S000_JT00_{i}.csv"), index=False)
     
 #Append data from years 2013-2020 and flag Paradise geocodes
-wac_files=[os.path.join(data_wac,f"wac_S000_JT00_{i}.csv") for i in range(2013,2020)]
+#Work Area Characteristics
+wac_df = pd.read_csv(os.path.join(data_wac, "wac_S000_JT00_2013.csv')
+wac_df['year'] = 2013
 
-#Read in first year and create year variable
-wac_df=pd.read_csv(wac_files[0])
-wac_df["year"]=2013
+for year in range(2014, 2021):
+    wac_year = pd.read_csv(os.path.join(data_wac, f"wac_S000_JT00_{year}.csv")
+    wac_year['year'] = year
+    wac_df = wac_df.append(wac_year, ignore_index=True)
+    wac_df.loc[wac_df['year'].isnull(), 'year'] = year
+
+wac_df['w_tract'] = wac_df['w_geocode'].astype(str).str.slice(stop=9)
+
+wac_df['paradise'] = 0
+wac_df.loc[wac_df['w_tract'].isin(["060070018", "060070019", "060070020", "060070021"]), 'paradise'] = 1
+
+wac_df.to_csv(os.path.join(data_wac, "wac_2013_2020.csv", index=False)
+
+#Residence Area Characteristics
+rac_df = pd.read_csv(os.path.join(data_rac, "rac_S000_JT00_2013.csv")
+rac_df['year'] = 2013
+
+for year in range(2014, 2021):
+    rac_year = pd.read_csv(os.path.join(data_rac,f"rac_S000_JT00_{year}.csv")
+    rac_year['year'] = year
+    rac_df = rac_df.append(rac_year, ignore_index=True)
+    rac_df.loc[rac_df['year'].isnull(), 'year'] = year
+
+rac_df['w_tract'] = rac_df['w_geocode'].astype(str).str.slice(stop=9)
+
+rac_df['paradise'] = 0
+rac_df.loc[rac_df['w_tract'].isin(["060070018", "060070019", "060070020", "060070021"]), 'paradise'] = 1
+
+rac_df.to_csv(os.path.join(data_od, "rac_2013_2020.csv", index=False)
 
