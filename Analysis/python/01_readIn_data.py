@@ -2,6 +2,7 @@ import os
 import requests
 import gzip
 import shutil
+import pandas as pd
 
 if os.getlogin() == "sandl305":
     programs = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs"
