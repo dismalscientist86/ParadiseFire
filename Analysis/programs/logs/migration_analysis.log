@@ -1,0 +1,30 @@
+2024-02-01 16:47:16,626 - INFO - Starting migration analysis
+2024-02-01 16:47:16,626 - INFO - Downloading the file from https://www2.census.gov/programs-surveys/demo/tables/geographic-mobility/2020/county-to-county-migration-2016-2020/county-to-county-migration-flows/Net_Gross_US.txt
+2024-02-01 16:47:31,811 - INFO - File downloaded successfully and saved as C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data\migration\Net_Gross_US.txt
+2024-02-01 16:47:31,811 - INFO - Detecting the encoding of the file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data\migration\Net_Gross_US.txt
+2024-02-01 16:51:04,736 - INFO - Encoding detected as ISO-8859-1
+2024-02-01 16:51:04,736 - INFO - Reading the fixed width file C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data\migration\Net_Gross_US.txt and returning the data frame
+2024-02-01 16:51:13,079 - INFO - Data frame created successfully with shape (426058, 13)
+2024-02-01 16:51:13,080 - INFO - Filtering the data frame for Butte County, California
+2024-02-01 16:51:13,104 - INFO - Data frame filtered successfully with shape (240, 13)
+2024-02-01 16:51:13,105 - INFO - Getting the summary of the data frame
+2024-02-01 16:51:13,110 - INFO - Getting the basic statistics of the numeric columns
+2024-02-01 16:51:13,140 - INFO - Getting the first 5 rows of the data frame
+2024-02-01 16:51:13,155 - INFO - Getting the last 5 rows of the data frame
+2024-02-01 16:51:13,169 - INFO - Getting the total net migration for Butte County
+2024-02-01 16:51:13,169 - INFO - Getting the average net migration for Butte County
+2024-02-01 16:51:13,170 - INFO - Getting the maximum net migration for Butte County
+2024-02-01 16:51:13,170 - INFO - Getting the minimum net migration for Butte County
+2024-02-01 16:51:13,170 - INFO - Getting the index of the row with the maximum net migration
+2024-02-01 16:51:13,170 - INFO - Getting the index of the row with the minimum net migration
+2024-02-01 16:51:13,170 - INFO - Getting the row with the maximum net migration
+2024-02-01 16:51:13,171 - INFO - Getting the row with the minimum net migration
+2024-02-01 16:51:13,172 - INFO - Plotting a bar chart of the net migration by county of prior residence
+2024-02-01 16:51:16,097 - INFO - Plotting a bar chart of the net migration by current residence county
+2024-02-01 16:51:18,730 - INFO - Plotting a scatter plot of the gross migration vs net migration
+2024-02-01 16:51:22,841 - INFO - Ending migration analysis
+2024-02-01 16:54:09,831 - INFO - Plotting a bar chart of the gross migration by county
+2024-02-01 16:55:08,905 - INFO - Plotting a scatter plot of the gross migration vs net migration
+2024-02-01 16:56:03,995 - INFO - Plotting a scatter plot of the gross migration vs net migration
+2024-02-01 17:00:40,161 - INFO - Plotting a scatter plot of flows from Butte and flows to Butte
+2024-02-01 17:01:07,701 - INFO - Plotting a scatter plot of flows from Butte and flows to Butte
