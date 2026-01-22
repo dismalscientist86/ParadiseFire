@@ -8,7 +8,7 @@ from pathlib import Path
 from config import (
     DATA_DIR,
     BUTTE_COUNTY_FIPS,
-    PARADISE_TRACTS_2010,
+    PARADISE_TRACTS,
     YEARS,
 )
 
@@ -44,18 +44,13 @@ def check_paradise_tracts():
     print(f"Unique tracts in Butte County: {butte['tract'].nunique()}")
 
     # Check for Paradise tracts
-    print(f"\nLooking for Paradise tracts (2010 codes): {PARADISE_TRACTS_2010}")
+    print(f"\nLooking for Paradise tracts: {PARADISE_TRACTS}")
 
-    # In 2020 geography, tract codes have 11 digits (state + county + tract)
-    # The 2010 codes we have are 9 digits. Let's check both formats.
-    paradise_2010_full = [f"06{t}" if len(t) == 9 else t for t in PARADISE_TRACTS_2010]
-
-    found_tracts = butte[butte["tract"].isin(paradise_2010_full)]["tract"].unique()
-    print(f"Found tracts matching 2010 codes: {list(found_tracts)}")
+    found_tracts = butte[butte["tract"].isin(PARADISE_TRACTS)]["tract"].unique()
+    print(f"Found Paradise tracts: {list(found_tracts)}")
 
     if len(found_tracts) == 0:
         print("\nWARNING: No exact matches found. Searching for similar tract codes...")
-        # Look for tracts starting with 06007001 or 06007002 (Paradise area)
         paradise_area = butte[butte["tract"].str.startswith("0600700")]["tract"].unique()
         print(f"Tracts in Paradise area (0600700*): {sorted(paradise_area)}")
 
@@ -128,6 +123,7 @@ def extract_butte_county_rac(years: list = None) -> pd.DataFrame:
 
         print(f"  Processing RAC {year}...")
         df = pd.read_csv(filepath, dtype={"h_geocode": str})
+        df.columns = df.columns.str.lower()  # Normalize column names
 
         # Ensure geocode is properly formatted
         df["h_geocode"] = df["h_geocode"].str.zfill(15)
@@ -167,6 +163,7 @@ def extract_butte_county_wac(years: list = None) -> pd.DataFrame:
 
         print(f"  Processing WAC {year}...")
         df = pd.read_csv(filepath, dtype={"w_geocode": str})
+        df.columns = df.columns.str.lower()  # Normalize column names
 
         # Ensure geocode is properly formatted
         df["w_geocode"] = df["w_geocode"].str.zfill(15)
@@ -204,10 +201,8 @@ def add_paradise_indicator(df: pd.DataFrame, geocode_col: str = "h_geocode") -> 
     if tract_col not in df.columns:
         df[tract_col] = df[geocode_col].str[:11]
 
-    # Paradise tracts - try both 9-digit and 11-digit formats
-    paradise_tracts_11 = [f"06{t}" if len(t) == 9 else t for t in PARADISE_TRACTS_2010]
-
-    df["paradise"] = df[tract_col].isin(paradise_tracts_11).astype(int)
+    # Paradise tracts (11-digit 2020 census codes)
+    df["paradise"] = df[tract_col].isin(PARADISE_TRACTS).astype(int)
 
     return df
 

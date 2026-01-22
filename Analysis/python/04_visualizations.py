@@ -16,8 +16,11 @@ from config import (
     TOP_INDUSTRY_NAMES,
 )
 
-# Set style
-plt.style.use("seaborn-v0_8-whitegrid")
+# Set style - use compatible style name
+try:
+    plt.style.use("seaborn-whitegrid")
+except OSError:
+    plt.style.use("ggplot")  # Fallback
 sns.set_palette("colorblind")
 
 # Fire year for vertical line

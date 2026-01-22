@@ -28,9 +28,9 @@ LODES_BASE_URL = "https://lehd.ces.census.gov/data/lodes/LODES8/ca"
 # Geographic constants
 BUTTE_COUNTY_FIPS = "06007"
 
-# Paradise census tracts (2010 geography - tracts 18, 19, 20, 21 in Butte County)
-# Note: These may need updating for 2020 census geography
-PARADISE_TRACTS_2010 = ["060070018", "060070019", "060070020", "060070021"]
+# Paradise census tracts (2020 geography - tracts 18, 19, 20, 21 in Butte County)
+# LODES8 uses 2020 census blocks with 11-digit tract codes
+PARADISE_TRACTS = ["06007001800", "06007001900", "06007002000", "06007002100"]
 
 # Data years
 YEARS = list(range(2013, 2024))  # 2013-2023
