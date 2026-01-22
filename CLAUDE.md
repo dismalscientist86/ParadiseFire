@@ -6,9 +6,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Research project studying the economic impacts of the 2018 Camp Fire on Paradise, California using LODES (Longitudinal Employer-Household Dynamics Origin-Destination Employment Statistics) data from the U.S. Census Bureau.
 
-## Running the Analysis
+## Running the Analysis (Python - Recommended)
 
-All code is in Stata (.do files). Programs should be run in numerical order:
+Python scripts are in `Analysis/python/`. Install dependencies and run the full pipeline:
+
+```bash
+cd Analysis/python
+pip install -r requirements.txt
+
+# Full pipeline (download, process, analyze, visualize)
+python run_analysis.py --all
+
+# Or run individual steps:
+python 01_download_data.py                    # Download LODES data (2013-2023)
+python 02_extract_process.py                  # Extract Butte County, identify Paradise
+python 03_analysis.py --data wac              # Run diff-in-diff regressions
+python 04_visualizations.py                   # Generate all plots
+```
+
+**Key Python files:**
+- `config.py`: Paths, constants, LODES variable definitions
+- `01_download_data.py`: Downloads raw LODES CSVs from Census Bureau
+- `02_extract_process.py`: Extracts Butte County, creates Paradise indicator
+- `03_analysis.py`: Aggregation and difference-in-differences regression
+- `04_visualizations.py`: Bar charts, trend lines, percent change plots
+
+## Running the Analysis (Stata - Legacy)
+
+Original Stata code is in `Analysis/programs/`. Run in numerical order:
 
 ```stata
 do 00_master_setup.do       # Sets up file paths (run first, or included by other scripts)
