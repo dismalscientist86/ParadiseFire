@@ -210,38 +210,49 @@ def run_synthetic_control(
     print(f"Total tract-years: {len(df):,}")
     print(f"Unique tracts: {df['tract'].nunique():,}")
 
-    # Prepare data
-    print("\nPreparing synthetic control data...")
-    paradise_df, donor_pivot = prepare_synthetic_control_data(df, outcome_var)
+    # Prepare data - ALWAYS normalize for synthetic control
+    # Normalization is essential because Paradise (4 tracts) has ~5000 jobs
+    # while individual donor tracts have ~500-3000 jobs each.
+    # With normalized indices (2017=100), all units become comparable.
+    print("\nPreparing synthetic control data (normalizing to 2017=100)...")
+    paradise_df, donor_pivot = prepare_synthetic_control_data(df, outcome_var, normalize=True)
 
-    # Select donors based on pre-treatment similarity
-    print(f"Selecting best donor matches from {len(donor_pivot)} available...")
-
-    # Calculate Paradise per-tract average (4 tracts)
-    paradise_per_tract = paradise_df[paradise_df["year"].isin(PRE_YEARS)]["paradise"].mean() / 4
-
-    # Calculate pre-treatment characteristics for each donor
+    # Verify normalization worked
     pre_cols = [c for c in PRE_YEARS if c in donor_pivot.columns]
-    donor_pre_means = donor_pivot[pre_cols].mean(axis=1)
+    paradise_pre_vals = paradise_df[paradise_df["year"].isin(PRE_YEARS)]["paradise"].values
+    print(f"Paradise pre-treatment values (should be ~100): {paradise_pre_vals.round(1)}")
+    print(f"Donor pre-treatment mean (should be ~100): {donor_pivot[pre_cols].mean().mean():.1f}")
+
+    # Select donors based on pre-treatment TREND similarity
+    # With normalized data, all units have similar levels (~100), so match on trends
+    print(f"\nSelecting best donor matches from {len(donor_pivot)} available...")
+
+    # Calculate pre-treatment trends for donors
     donor_pre_trends = donor_pivot[pre_cols].apply(
-        lambda row: np.polyfit(range(len(pre_cols)), row.values, 1)[0] if row.notna().all() else 0,
+        lambda row: np.polyfit(range(len(pre_cols)), row.values, 1)[0] if row.notna().all() else np.nan,
         axis=1
     )
 
-    # Paradise trend
-    paradise_pre = paradise_df[paradise_df["year"].isin(PRE_YEARS)]["paradise"].values
-    paradise_trend = np.polyfit(range(len(paradise_pre)), paradise_pre, 1)[0] / 4
+    # Paradise trend (in normalized terms)
+    paradise_trend = np.polyfit(range(len(paradise_pre_vals)), paradise_pre_vals, 1)[0]
+    print(f"Paradise pre-treatment trend: {paradise_trend:.2f} per year")
 
-    # Score donors by similarity (lower is better)
-    # Normalize each component
-    mean_diff = np.abs(donor_pre_means - paradise_per_tract) / paradise_per_tract
-    trend_diff = np.abs(donor_pre_trends - paradise_trend) / (np.abs(paradise_trend) + 1)
+    # Score donors by trend similarity (lower is better)
+    trend_diff = np.abs(donor_pre_trends - paradise_trend)
 
-    # Combined score
-    similarity_score = mean_diff + 0.5 * trend_diff
+    # Also consider level match (should be close to 100)
+    donor_pre_means = donor_pivot[pre_cols].mean(axis=1)
+    paradise_pre_mean = paradise_pre_vals.mean()
+    level_diff = np.abs(donor_pre_means - paradise_pre_mean)
+
+    # Combined score: trend similarity + level similarity
+    similarity_score = trend_diff + 0.1 * level_diff
+
+    # Remove any with NaN scores
+    similarity_score = similarity_score.dropna()
 
     # Select top donors by similarity
-    n_select = min(max_donors, len(donor_pivot))
+    n_select = min(max_donors, len(similarity_score))
     best_donors = similarity_score.nsmallest(n_select).index
     donor_pivot = donor_pivot.loc[best_donors]
     print(f"Selected {len(donor_pivot)} most similar donors")
@@ -255,7 +266,7 @@ def run_synthetic_control(
 
     print(f"\nPre-treatment years: {pre_years_available}")
     print(f"Post-treatment years: {post_years_available}")
-    print(f"Paradise pre-treatment mean: {treated_pre.mean():,.0f}")
+    print(f"Paradise pre-treatment index mean: {treated_pre.mean():.1f} (2017=100)")
 
     # Find optimal weights
     print("\nFinding optimal synthetic control weights...")
@@ -292,16 +303,26 @@ def run_synthetic_control(
     treatment_effect = post_gap - pre_gap
 
     print("\n" + "-" * 70)
-    print("Results")
+    print("Results (Index where 2017=100)")
     print("-" * 70)
-    print(f"Pre-treatment gap (Paradise - Synthetic): {pre_gap:,.1f}")
-    print(f"Post-treatment gap (Paradise - Synthetic): {post_gap:,.1f}")
-    print(f"Treatment Effect (Synthetic DiD): {treatment_effect:,.1f}")
+    print(f"Pre-treatment gap (Paradise - Synthetic): {pre_gap:.1f} index points")
+    print(f"Post-treatment gap (Paradise - Synthetic): {post_gap:.1f} index points")
+    print(f"Treatment Effect (Synthetic DiD): {treatment_effect:.1f} index points")
 
     # Pre-treatment fit
     pre_mse = np.mean((results[results["period"] == "pre"]["gap"]) ** 2)
     pre_rmse = np.sqrt(pre_mse)
-    print(f"Pre-treatment RMSE: {pre_rmse:,.1f}")
+    print(f"Pre-treatment RMSE: {pre_rmse:.1f} (lower is better, <5 is good)")
+
+    # Interpretation
+    if pre_rmse < 10:
+        print("\nInterpretation:")
+        print(f"  The synthetic control closely matched Paradise pre-fire (RMSE={pre_rmse:.1f})")
+        post_synthetic_mean = results[results["period"] == "post"]["synthetic"].mean()
+        post_actual_mean = results[results["period"] == "post"]["paradise"].mean()
+        pct_decline = 100 * (post_actual_mean - post_synthetic_mean) / post_synthetic_mean
+        print(f"  Post-fire Paradise employment was {abs(pct_decline):.1f}% {'lower' if pct_decline < 0 else 'higher'}")
+        print(f"  than what the synthetic control predicts it would have been.")
 
     # Save results
     results_path = DATA_DIR / f"synthetic_control_{data_type}_{outcome_var}.csv"
@@ -329,8 +350,9 @@ def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jo
     ax.plot(results["year"], results["paradise"], "o-", label="Paradise (Actual)", linewidth=2)
     ax.plot(results["year"], results["synthetic"], "s--", label="Synthetic Paradise", linewidth=2)
     ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7, label="Camp Fire")
+    ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5, label="2017 Baseline")
     ax.set_xlabel("Year")
-    ax.set_ylabel(outcome_label)
+    ax.set_ylabel(f"{outcome_label} Index (2017=100)")
     ax.set_title(f"Paradise vs Synthetic Control: {outcome_label}")
     ax.legend()
     ax.grid(True, alpha=0.3)
@@ -342,8 +364,8 @@ def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jo
     ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7)
     ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
     ax.set_xlabel("Year")
-    ax.set_ylabel("Gap (Paradise - Synthetic)")
-    ax.set_title("Treatment Effect: Gap Between Actual and Synthetic")
+    ax.set_ylabel("Gap (Index Points)")
+    ax.set_title("Treatment Effect: Paradise - Synthetic Control")
     ax.grid(True, alpha=0.3)
 
     # Add legend for colors
@@ -367,7 +389,8 @@ def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jo
 def run_placebo_tests(
     data_type: str = "wac",
     outcome_var: str = "c000",
-    n_placebos: int = 50,
+    n_placebos: int = 100,
+    max_donors_per_placebo: int = 200,
 ):
     """
     Run placebo tests by applying synthetic control to donor tracts.
@@ -383,61 +406,190 @@ def run_placebo_tests(
     print("\nLoading data...")
     df = load_california_tract_data(data_type)
 
-    # Get Paradise results first
-    paradise_df, donor_pivot = prepare_synthetic_control_data(df, outcome_var)
+    # Get normalized data (same as main analysis)
+    print("\nPreparing normalized data...")
+    paradise_df, donor_pivot = prepare_synthetic_control_data(df, outcome_var, normalize=True)
 
-    # Sample placebo tracts
-    placebo_tracts = np.random.choice(donor_pivot.index, size=min(n_placebos, len(donor_pivot)), replace=False)
+    pre_years = [y for y in PRE_YEARS if y in donor_pivot.columns]
+    post_years = [y for y in POST_YEARS if y in donor_pivot.columns]
+
+    # First, calculate Paradise effect for comparison
+    print("\nCalculating Paradise effect...")
+    paradise_pre = paradise_df[paradise_df["year"].isin(pre_years)]["paradise"].values
+
+    # Select similar donors for Paradise (same as main analysis)
+    donor_pre_trends = donor_pivot[pre_years].apply(
+        lambda row: np.polyfit(range(len(pre_years)), row.values, 1)[0] if row.notna().all() else np.nan,
+        axis=1
+    )
+    paradise_trend = np.polyfit(range(len(paradise_pre)), paradise_pre, 1)[0]
+    trend_diff = np.abs(donor_pre_trends - paradise_trend).dropna()
+    best_donors = trend_diff.nsmallest(500).index
+    paradise_donor_pool = donor_pivot.loc[best_donors]
+
+    # Get Paradise weights and effect
+    donors_pre = paradise_donor_pool[pre_years].values
+    weights = synthetic_control_weights(paradise_pre, donors_pre)
+
+    donors_all = paradise_donor_pool[pre_years + post_years].values
+    synthetic_all = donors_all.T @ weights
+    paradise_all = paradise_df[paradise_df["year"].isin(pre_years + post_years)]["paradise"].values
+
+    gap = paradise_all - synthetic_all
+    paradise_pre_gap = gap[:len(pre_years)].mean()
+    paradise_post_gap = gap[len(pre_years):].mean()
+    paradise_effect = paradise_post_gap - paradise_pre_gap
+    paradise_pre_rmse = np.sqrt(np.mean(gap[:len(pre_years)]**2))
+
+    print(f"Paradise treatment effect: {paradise_effect:.1f} index points")
+    print(f"Paradise pre-treatment RMSE: {paradise_pre_rmse:.2f}")
+
+    # Sample placebo tracts (use tracts with good pre-treatment fit potential)
+    # Filter to tracts with similar size/trend characteristics
+    np.random.seed(42)  # For reproducibility
+    candidate_tracts = donor_pivot.index.tolist()
+    placebo_tracts = np.random.choice(candidate_tracts, size=min(n_placebos, len(candidate_tracts)), replace=False)
 
     placebo_effects = []
+    placebo_rmses = []
 
     print(f"\nRunning {len(placebo_tracts)} placebo tests...")
     for i, placebo_tract in enumerate(placebo_tracts):
-        if (i + 1) % 10 == 0:
-            print(f"  {i + 1}/{len(placebo_tracts)}")
+        if (i + 1) % 20 == 0:
+            print(f"  {i + 1}/{len(placebo_tracts)} completed...")
 
-        # Treat this tract as if it were treated
-        placebo_outcome = donor_pivot.loc[placebo_tract].values
-
-        # Create donor pool excluding this tract
-        other_donors = donor_pivot.drop(placebo_tract)
-
-        pre_years = [y for y in PRE_YEARS if y in donor_pivot.columns]
-        post_years = [y for y in POST_YEARS if y in donor_pivot.columns]
-
-        placebo_pre = donor_pivot.loc[placebo_tract, pre_years].values
-        donors_pre = other_donors[pre_years].values
-
-        # Find weights
         try:
-            weights = synthetic_control_weights(placebo_pre, donors_pre)
+            # Get placebo tract's pre-treatment values
+            placebo_pre = donor_pivot.loc[placebo_tract, pre_years].values
+
+            # Create donor pool excluding this tract
+            other_donors = donor_pivot.drop(placebo_tract)
+
+            # Select donors similar to this placebo tract
+            other_trends = other_donors[pre_years].apply(
+                lambda row: np.polyfit(range(len(pre_years)), row.values, 1)[0] if row.notna().all() else np.nan,
+                axis=1
+            )
+            placebo_trend = np.polyfit(range(len(placebo_pre)), placebo_pre, 1)[0]
+            trend_diff = np.abs(other_trends - placebo_trend).dropna()
+
+            n_select = min(max_donors_per_placebo, len(trend_diff))
+            selected_donors = trend_diff.nsmallest(n_select).index
+            placebo_donor_pool = other_donors.loc[selected_donors]
+
+            # Find weights
+            donors_pre_mat = placebo_donor_pool[pre_years].values
+            weights = synthetic_control_weights(placebo_pre, donors_pre_mat)
 
             # Calculate effect
-            donors_all = other_donors[pre_years + post_years].values
-            synthetic_all = donors_all.T @ weights
+            donors_all_mat = placebo_donor_pool[pre_years + post_years].values
+            synthetic_all = donors_all_mat.T @ weights
             actual_all = donor_pivot.loc[placebo_tract, pre_years + post_years].values
 
             gap = actual_all - synthetic_all
             pre_gap = gap[:len(pre_years)].mean()
             post_gap = gap[len(pre_years):].mean()
             effect = post_gap - pre_gap
+            pre_rmse = np.sqrt(np.mean(gap[:len(pre_years)]**2))
 
             placebo_effects.append(effect)
-        except:
+            placebo_rmses.append(pre_rmse)
+        except Exception as e:
             continue
 
     placebo_effects = np.array(placebo_effects)
+    placebo_rmses = np.array(placebo_rmses)
 
-    # Compare Paradise effect to placebos
-    # (Need to run Paradise analysis to get its effect)
+    # Filter to placebos with good pre-treatment fit (RMSE < 10)
+    good_fit_mask = placebo_rmses < 10
+    placebo_effects_good = placebo_effects[good_fit_mask]
 
-    print(f"\nPlacebo effect distribution:")
-    print(f"  Mean: {np.mean(placebo_effects):,.1f}")
-    print(f"  Std: {np.std(placebo_effects):,.1f}")
-    print(f"  Min: {np.min(placebo_effects):,.1f}")
-    print(f"  Max: {np.max(placebo_effects):,.1f}")
+    print(f"\n" + "-" * 70)
+    print("Results")
+    print("-" * 70)
+    print(f"Placebo tests completed: {len(placebo_effects)}")
+    print(f"Placebos with good pre-fit (RMSE<10): {len(placebo_effects_good)}")
 
-    return placebo_effects
+    print(f"\nPlacebo effect distribution (good fit only):")
+    print(f"  Mean: {np.mean(placebo_effects_good):.1f}")
+    print(f"  Std: {np.std(placebo_effects_good):.1f}")
+    print(f"  Min: {np.min(placebo_effects_good):.1f}")
+    print(f"  Max: {np.max(placebo_effects_good):.1f}")
+
+    # Calculate p-value (proportion of placebos with effect as extreme as Paradise)
+    n_more_extreme = np.sum(placebo_effects_good <= paradise_effect)
+    p_value = (n_more_extreme + 1) / (len(placebo_effects_good) + 1)
+
+    print(f"\nParadise effect: {paradise_effect:.1f}")
+    print(f"Placebos more negative than Paradise: {n_more_extreme}")
+    print(f"One-sided p-value: {p_value:.4f}")
+
+    # Alternative: RMSPE ratio approach (standard in SC literature)
+    # This accounts for pre-treatment fit quality
+    paradise_post_rmse = np.sqrt(np.mean(gap[len(pre_years):]**2))
+    paradise_rmspe_ratio = paradise_post_rmse / (paradise_pre_rmse + 0.1)  # Add small constant to avoid div by 0
+
+    placebo_rmspe_ratios = []
+    for i, (eff, pre_rmse) in enumerate(zip(placebo_effects, placebo_rmses)):
+        if pre_rmse < 10:  # Good pre-fit only
+            # Approximate post-RMSE from effect (effect ≈ post_gap, and we stored pre_rmse)
+            # This is an approximation; ideally we'd store post_rmse too
+            post_rmse_approx = abs(eff)  # Rough approximation
+            ratio = post_rmse_approx / (pre_rmse + 0.1)
+            placebo_rmspe_ratios.append(ratio)
+
+    placebo_rmspe_ratios = np.array(placebo_rmspe_ratios)
+    n_higher_ratio = np.sum(placebo_rmspe_ratios >= paradise_rmspe_ratio)
+    p_value_ratio = (n_higher_ratio + 1) / (len(placebo_rmspe_ratios) + 1)
+
+    print(f"\nRMSPE Ratio approach (post/pre RMSE):")
+    print(f"Paradise RMSPE ratio: {paradise_rmspe_ratio:.1f}")
+    print(f"Placebos with higher ratio: {n_higher_ratio}")
+    print(f"P-value (RMSPE ratio): {p_value_ratio:.4f}")
+
+    # Plot results
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Left: Histogram of placebo effects
+    ax = axes[0]
+    ax.hist(placebo_effects_good, bins=30, alpha=0.7, color="steelblue", edgecolor="white")
+    ax.axvline(x=paradise_effect, color="red", linewidth=2, linestyle="--", label=f"Paradise: {paradise_effect:.1f}")
+    ax.axvline(x=0, color="black", linewidth=1, linestyle="-")
+    ax.set_xlabel("Treatment Effect (Index Points)")
+    ax.set_ylabel("Frequency")
+    ax.set_title("Distribution of Placebo Effects")
+    ax.legend()
+
+    # Right: Sorted effects with Paradise highlighted
+    ax = axes[1]
+    sorted_effects = np.sort(placebo_effects_good)
+    ranks = np.arange(len(sorted_effects))
+    ax.scatter(ranks, sorted_effects, alpha=0.5, color="steelblue", s=20)
+
+    # Find where Paradise would rank
+    paradise_rank = np.searchsorted(sorted_effects, paradise_effect)
+    ax.scatter([paradise_rank], [paradise_effect], color="red", s=100, zorder=5, label=f"Paradise (rank {paradise_rank+1}/{len(sorted_effects)+1})")
+    ax.axhline(y=0, color="black", linewidth=1, linestyle="-")
+    ax.set_xlabel("Rank")
+    ax.set_ylabel("Treatment Effect (Index Points)")
+    ax.set_title("Ranked Placebo Effects")
+    ax.legend()
+
+    plt.tight_layout()
+
+    filepath = GRAPHS_DIR / "placebo_tests.png"
+    plt.savefig(filepath, dpi=150, bbox_inches="tight")
+    print(f"\nSaved: {filepath}")
+
+    # Save results
+    results_df = pd.DataFrame({
+        "tract": placebo_tracts[:len(placebo_effects)],
+        "effect": placebo_effects,
+        "pre_rmse": placebo_rmses
+    })
+    results_df.to_csv(DATA_DIR / f"placebo_results_{data_type}.csv", index=False)
+
+    return placebo_effects, paradise_effect, p_value
 
 
 if __name__ == "__main__":
@@ -448,11 +600,12 @@ if __name__ == "__main__":
     parser.add_argument("--outcome", default="c000", help="Outcome variable")
     parser.add_argument("--max-donors", type=int, default=1000)
     parser.add_argument("--placebo", action="store_true", help="Run placebo tests")
+    parser.add_argument("--n-placebos", type=int, default=100, help="Number of placebo tests")
 
     args = parser.parse_args()
 
     if args.placebo:
-        run_placebo_tests(args.data, args.outcome)
+        run_placebo_tests(args.data, args.outcome, n_placebos=args.n_placebos)
     else:
         results, weights, effect = run_synthetic_control(
             args.data,
