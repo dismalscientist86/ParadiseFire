@@ -101,6 +101,8 @@ do 07_difference_in_difference.do  # Run diff-in-diff regressions
 
 ## Path Configuration
 
+**Python executable:** `/c/Users/Sandler/anaconda3/python.exe` (Anaconda installation)
+
 **Python (`config.py`):**
 - `CODE_DIR`: Auto-detected from script location (Dropbox)
 - `DATA_ROOT`: Set to `M:/ParadiseFire` (large data files stored externally)
