@@ -338,7 +338,7 @@ def run_synthetic_control(
     weights_path = DATA_DIR / f"synthetic_weights_{data_type}_{outcome_var}.csv"
     weights_df.to_csv(weights_path, index=False)
 
-    return results, weights, treatment_effect
+    return results, weights, treatment_effect, paradise_df, donor_pivot
 
 
 def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jobs", save: bool = True):
@@ -386,20 +386,92 @@ def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jo
     return fig
 
 
+def plot_paradise_vs_donors(
+    paradise_df: pd.DataFrame,
+    donor_pivot: pd.DataFrame,
+    outcome_label: str = "Total Jobs",
+    max_donors_to_plot: int = 500,
+    save: bool = True,
+):
+    """
+    Plot Paradise against all donor tracts.
+
+    Paradise is shown in full color, donor tracts are faded gray lines.
+    This visualization shows how Paradise diverged from the donor pool after the fire.
+
+    Parameters:
+    -----------
+    paradise_df : DataFrame with columns ['year', 'paradise']
+    donor_pivot : DataFrame with tracts as index, years as columns
+    outcome_label : str - Label for the outcome variable
+    max_donors_to_plot : int - Maximum number of donor lines to plot (for performance)
+    save : bool - Whether to save the figure
+    """
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    years = sorted(paradise_df["year"].unique())
+
+    # Plot donor tracts in faded gray
+    donors_to_plot = donor_pivot.index[:max_donors_to_plot]
+    for i, tract in enumerate(donors_to_plot):
+        tract_data = donor_pivot.loc[tract, years].values
+        ax.plot(years, tract_data, color="gray", alpha=0.1, linewidth=0.5, zorder=1)
+
+    # Add a single label for donor tracts
+    ax.plot([], [], color="gray", alpha=0.3, linewidth=1, label=f"Donor Tracts (n={len(donor_pivot)})")
+
+    # Plot Paradise in bold color
+    paradise_values = paradise_df.set_index("year").loc[years, "paradise"].values
+    ax.plot(years, paradise_values, "o-", color="#D62728", linewidth=3, markersize=8,
+            label="Paradise", zorder=3)
+
+    # Add fire line
+    ax.axvline(x=FIRE_YEAR + 0.5, color="orange", linestyle="--", linewidth=2,
+               alpha=0.8, label="Camp Fire (Nov 2018)", zorder=2)
+
+    # Add baseline reference
+    ax.axhline(y=100, color="black", linestyle=":", alpha=0.5, linewidth=1)
+
+    ax.set_xlabel("Year", fontsize=12)
+    ax.set_ylabel(f"{outcome_label} Index (2017=100)", fontsize=12)
+    ax.set_title(f"Paradise vs California Donor Tracts: {outcome_label}", fontsize=14)
+    ax.legend(loc="upper right", fontsize=10)
+    ax.grid(True, alpha=0.3)
+
+    # Set y-axis limits to focus on relevant range
+    ax.set_ylim(0, 200)
+
+    plt.tight_layout()
+
+    if save:
+        filepath = GRAPHS_DIR / "paradise_vs_donors.png"
+        plt.savefig(filepath, dpi=150, bbox_inches="tight")
+        print(f"Saved: {filepath}")
+
+    return fig
+
+
 def run_placebo_tests(
     data_type: str = "wac",
     outcome_var: str = "c000",
     n_placebos: int = 100,
     max_donors_per_placebo: int = 200,
+    exclude_years: list = None,
 ):
     """
     Run placebo tests by applying synthetic control to donor tracts.
 
     This helps assess whether the Paradise effect is unusual compared
     to what we'd expect by chance.
+
+    Parameters:
+    -----------
+    exclude_years : list - Years to exclude from post-treatment analysis (e.g., [2020] for COVID)
     """
     print("=" * 70)
     print("Placebo Tests")
+    if exclude_years:
+        print(f"(Excluding years: {exclude_years})")
     print("=" * 70)
 
     # Load data
@@ -412,6 +484,11 @@ def run_placebo_tests(
 
     pre_years = [y for y in PRE_YEARS if y in donor_pivot.columns]
     post_years = [y for y in POST_YEARS if y in donor_pivot.columns]
+
+    # Exclude specified years from post-treatment period
+    if exclude_years:
+        post_years = [y for y in post_years if y not in exclude_years]
+        print(f"Post-treatment years (after exclusion): {post_years}")
 
     # First, calculate Paradise effect for comparison
     print("\nCalculating Paradise effect...")
@@ -431,15 +508,22 @@ def run_placebo_tests(
     donors_pre = paradise_donor_pool[pre_years].values
     weights = synthetic_control_weights(paradise_pre, donors_pre)
 
-    donors_all = paradise_donor_pool[pre_years + post_years].values
-    synthetic_all = donors_all.T @ weights
-    paradise_all = paradise_df[paradise_df["year"].isin(pre_years + post_years)]["paradise"].values
+    # Calculate gaps for pre and post periods separately
+    donors_pre_vals = paradise_donor_pool[pre_years].values
+    synthetic_pre = donors_pre_vals.T @ weights
+    paradise_pre_vals = paradise_df[paradise_df["year"].isin(pre_years)]["paradise"].values
+    gap_pre = paradise_pre_vals - synthetic_pre
 
-    gap = paradise_all - synthetic_all
-    paradise_pre_gap = gap[:len(pre_years)].mean()
-    paradise_post_gap = gap[len(pre_years):].mean()
+    donors_post_vals = paradise_donor_pool[post_years].values
+    synthetic_post = donors_post_vals.T @ weights
+    paradise_post_vals = paradise_df[paradise_df["year"].isin(post_years)]["paradise"].values
+    gap_post = paradise_post_vals - synthetic_post
+
+    paradise_pre_gap = gap_pre.mean()
+    paradise_post_gap = gap_post.mean()
     paradise_effect = paradise_post_gap - paradise_pre_gap
-    paradise_pre_rmse = np.sqrt(np.mean(gap[:len(pre_years)]**2))
+    paradise_pre_rmse = np.sqrt(np.mean(gap_pre**2))
+    paradise_post_rmse = np.sqrt(np.mean(gap_post**2))
 
     print(f"Paradise treatment effect: {paradise_effect:.1f} index points")
     print(f"Paradise pre-treatment RMSE: {paradise_pre_rmse:.2f}")
@@ -477,20 +561,24 @@ def run_placebo_tests(
             selected_donors = trend_diff.nsmallest(n_select).index
             placebo_donor_pool = other_donors.loc[selected_donors]
 
-            # Find weights
+            # Find weights using pre-treatment data
             donors_pre_mat = placebo_donor_pool[pre_years].values
             weights = synthetic_control_weights(placebo_pre, donors_pre_mat)
 
-            # Calculate effect
-            donors_all_mat = placebo_donor_pool[pre_years + post_years].values
-            synthetic_all = donors_all_mat.T @ weights
-            actual_all = donor_pivot.loc[placebo_tract, pre_years + post_years].values
+            # Calculate pre-treatment gap
+            synthetic_pre = donors_pre_mat.T @ weights
+            gap_pre = placebo_pre - synthetic_pre
+            pre_gap = gap_pre.mean()
+            pre_rmse = np.sqrt(np.mean(gap_pre**2))
 
-            gap = actual_all - synthetic_all
-            pre_gap = gap[:len(pre_years)].mean()
-            post_gap = gap[len(pre_years):].mean()
+            # Calculate post-treatment gap (using filtered post_years)
+            placebo_post = donor_pivot.loc[placebo_tract, post_years].values
+            donors_post_mat = placebo_donor_pool[post_years].values
+            synthetic_post = donors_post_mat.T @ weights
+            gap_post = placebo_post - synthetic_post
+            post_gap = gap_post.mean()
+
             effect = post_gap - pre_gap
-            pre_rmse = np.sqrt(np.mean(gap[:len(pre_years)]**2))
 
             placebo_effects.append(effect)
             placebo_rmses.append(pre_rmse)
@@ -526,7 +614,6 @@ def run_placebo_tests(
 
     # Alternative: RMSPE ratio approach (standard in SC literature)
     # This accounts for pre-treatment fit quality
-    paradise_post_rmse = np.sqrt(np.mean(gap[len(pre_years):]**2))
     paradise_rmspe_ratio = paradise_post_rmse / (paradise_pre_rmse + 0.1)  # Add small constant to avoid div by 0
 
     placebo_rmspe_ratios = []
@@ -577,7 +664,11 @@ def run_placebo_tests(
 
     plt.tight_layout()
 
-    filepath = GRAPHS_DIR / "placebo_tests.png"
+    # Include exclusion info in filename
+    suffix = ""
+    if exclude_years:
+        suffix = f"_excl{'_'.join(str(y) for y in exclude_years)}"
+    filepath = GRAPHS_DIR / f"placebo_tests{suffix}.png"
     plt.savefig(filepath, dpi=150, bbox_inches="tight")
     print(f"\nSaved: {filepath}")
 
@@ -587,7 +678,7 @@ def run_placebo_tests(
         "effect": placebo_effects,
         "pre_rmse": placebo_rmses
     })
-    results_df.to_csv(DATA_DIR / f"placebo_results_{data_type}.csv", index=False)
+    results_df.to_csv(DATA_DIR / f"placebo_results_{data_type}{suffix}.csv", index=False)
 
     return placebo_effects, paradise_effect, p_value
 
@@ -601,16 +692,27 @@ if __name__ == "__main__":
     parser.add_argument("--max-donors", type=int, default=1000)
     parser.add_argument("--placebo", action="store_true", help="Run placebo tests")
     parser.add_argument("--n-placebos", type=int, default=100, help="Number of placebo tests")
+    parser.add_argument("--exclude-2020", action="store_true",
+                        help="Exclude 2020 from post-treatment (COVID shock)")
 
     args = parser.parse_args()
 
+    # Build exclude_years list
+    exclude_years = [2020] if args.exclude_2020 else None
+
     if args.placebo:
-        run_placebo_tests(args.data, args.outcome, n_placebos=args.n_placebos)
+        run_placebo_tests(
+            args.data,
+            args.outcome,
+            n_placebos=args.n_placebos,
+            exclude_years=exclude_years,
+        )
     else:
-        results, weights, effect = run_synthetic_control(
+        results, weights, effect, paradise_df, donor_pivot = run_synthetic_control(
             args.data,
             args.outcome,
             args.max_donors
         )
         plot_synthetic_control(results)
+        plot_paradise_vs_donors(paradise_df, donor_pivot)
         plt.show()
