@@ -343,38 +343,18 @@ def run_synthetic_control(
 
 def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jobs", save: bool = True):
     """Plot synthetic control results."""
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    # Left: Paradise vs Synthetic
-    ax = axes[0]
-    ax.plot(results["year"], results["paradise"], "o-", label="Paradise (Actual)", linewidth=2)
-    ax.plot(results["year"], results["synthetic"], "s--", label="Synthetic Paradise", linewidth=2)
-    ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7, label="Camp Fire")
+    # Paradise vs Synthetic
+    ax.plot(results["year"], results["paradise"], "o-", label="Paradise (Actual)", linewidth=2.5, markersize=8)
+    ax.plot(results["year"], results["synthetic"], "s--", label="Synthetic Paradise", linewidth=2.5, markersize=8)
+    ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7, linewidth=2, label="Camp Fire")
     ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5, label="2017 Baseline")
-    ax.set_xlabel("Year")
-    ax.set_ylabel(f"{outcome_label} Index (2017=100)")
-    ax.set_title(f"Paradise vs Synthetic Control: {outcome_label}")
-    ax.legend()
+    ax.set_xlabel("Year", fontsize=12)
+    ax.set_ylabel(f"{outcome_label} Index (2017=100)", fontsize=12)
+    ax.set_title(f"Paradise vs Synthetic Control: {outcome_label}", fontsize=14)
+    ax.legend(loc="upper right")
     ax.grid(True, alpha=0.3)
-
-    # Right: Gap (Treatment Effect)
-    ax = axes[1]
-    colors = ["blue" if p == "pre" else "red" for p in results["period"]]
-    ax.bar(results["year"], results["gap"], color=colors, alpha=0.7)
-    ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7)
-    ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
-    ax.set_xlabel("Year")
-    ax.set_ylabel("Gap (Index Points)")
-    ax.set_title("Treatment Effect: Paradise - Synthetic Control")
-    ax.grid(True, alpha=0.3)
-
-    # Add legend for colors
-    from matplotlib.patches import Patch
-    legend_elements = [
-        Patch(facecolor="blue", alpha=0.7, label="Pre-Fire"),
-        Patch(facecolor="red", alpha=0.7, label="Post-Fire"),
-    ]
-    ax.legend(handles=legend_elements)
 
     plt.tight_layout()
 
