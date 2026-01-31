@@ -10,6 +10,9 @@ Research project studying the economic impacts of the 2018 Camp Fire on Paradise
 
 ```
 ParadiseFire/
+├── .gitignore           # Excludes *.csv.gz, lodes_od/, lodes_rac/, lodes_wac/
+├── README.md
+├── CLAUDE.md
 ├── Analysis/
 │   ├── data/           # Migration data, tract maps, supporting data
 │   ├── graphs/         # Generated visualizations (PNG, JPG)
@@ -44,6 +47,10 @@ python 04_visualizations.py                   # Generate all plots
 python 05_synthetic_control.py --data wac     # Run synthetic control method
 python 05_synthetic_control.py --placebo      # Run placebo tests
 python 05_synthetic_control.py --placebo --exclude-2020  # Placebo tests excluding COVID year
+
+# Migration and commute analyses (standalone, not part of run_analysis.py pipeline)
+python 06_migration_analysis.py                # IRS SOI migration analysis
+python 07_commute_analysis.py                  # OD commute pattern analysis
 ```
 
 **Key Python files:**
@@ -53,7 +60,9 @@ python 05_synthetic_control.py --placebo --exclude-2020  # Placebo tests excludi
 - `03_analysis.py`: Aggregation and difference-in-differences regression
 - `04_visualizations.py`: Bar charts, trend lines, percent change plots
 - `05_synthetic_control.py`: Synthetic control method with placebo tests
-- `run_analysis.py`: Pipeline orchestrator (supports `--all`, `--download`, `--process`, `--analyze`, `--visualize`)
+- `06_migration_analysis.py`: IRS SOI county-to-county migration analysis (where displaced residents went)
+- `07_commute_analysis.py`: LODES Origin-Destination commute pattern analysis (pre/post fire)
+- `run_analysis.py`: Pipeline orchestrator for steps 01-04 (supports `--all`, `--download`, `--process`, `--analyze`, `--visualize`)
 
 **Other Python utilities:**
 - `readIn_migration.py`, `readIn_SOImigration.py`: Migration data processing
@@ -120,3 +129,7 @@ To add a new user, add a conditional block in `00_master_setup.do`.
 **Difference-in-Differences:** Compares Paradise to the rest of Butte County, with the fire (November 2018) as the treatment event. Control variables include 2017 baseline levels of prime-age workers, education, and gender composition.
 
 **Synthetic Control:** Creates a weighted combination of other California tracts that best match Paradise's pre-fire employment trends. Excludes Butte County donors to avoid spillover effects. Includes placebo tests for statistical inference.
+
+**Migration Analysis:** Uses IRS Statistics of Income county-to-county migration data to track where Butte County residents moved after the fire. Compares outflow patterns in pre-fire (2015-2018) and post-fire (2018-2022) periods.
+
+**Commute Analysis:** Uses LODES Origin-Destination data to examine commute patterns — where Paradise residents worked and where Paradise workers lived — and how these patterns shifted after the fire.
