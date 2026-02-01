@@ -51,6 +51,12 @@ python 05_synthetic_control.py --placebo --exclude-2020  # Placebo tests excludi
 # Migration and commute analyses (standalone, not part of run_analysis.py pipeline)
 python 06_migration_analysis.py                # IRS SOI migration analysis
 python 07_commute_analysis.py                  # OD commute pattern analysis
+
+# Spillover analysis (employment + housing vacancy)
+python 08_spillover_analysis.py                # Full spillover analysis
+python 08_spillover_analysis.py --synth-only   # Synthetic control for Chico/Other Butte only
+python 08_spillover_analysis.py --vacancy-only # USPS vacancy analysis only
+python 08_spillover_analysis.py --exclude-2020 # Exclude COVID year
 ```
 
 **Key Python files:**
@@ -62,13 +68,14 @@ python 07_commute_analysis.py                  # OD commute pattern analysis
 - `05_synthetic_control.py`: Synthetic control method with placebo tests
 - `06_migration_analysis.py`: IRS SOI county-to-county migration analysis (where displaced residents went)
 - `07_commute_analysis.py`: LODES Origin-Destination commute pattern analysis (pre/post fire)
+- `08_spillover_analysis.py`: Employment and housing vacancy spillover effects on Chico/Butte County
 - `run_analysis.py`: Pipeline orchestrator for steps 01-04 (supports `--all`, `--download`, `--process`, `--analyze`, `--visualize`)
 
 **Other Python utilities:**
 - `readIn_migration.py`, `readIn_SOImigration.py`: Migration data processing
 - `01_readIn_data.py`, `02_residentialarea_graphs.py`, `03_workarea_graphs.py`: Alternative/legacy scripts
 
-**Dependencies:** pandas, numpy, requests, matplotlib, seaborn, statsmodels, pyarrow, scipy
+**Dependencies:** pandas, numpy, requests, matplotlib, seaborn, statsmodels, pyarrow, scipy, dbfread
 
 ## Running the Analysis (Stata - Legacy)
 
@@ -133,3 +140,5 @@ To add a new user, add a conditional block in `00_master_setup.do`.
 **Migration Analysis:** Uses IRS Statistics of Income county-to-county migration data to track where Butte County residents moved after the fire. Compares outflow patterns in pre-fire (2015-2018) and post-fire (2018-2022) periods.
 
 **Commute Analysis:** Uses LODES Origin-Destination data to examine commute patterns — where Paradise residents worked and where Paradise workers lived — and how these patterns shifted after the fire.
+
+**Spillover Analysis:** Tests whether the Camp Fire caused positive employment spillovers to neighboring Butte County communities (especially Chico). Uses synthetic control and event study methods with non-Butte California tracts as controls. Also analyzes USPS vacancy data (`M:/USPS_Vacancy/`) to track residential and business vacancy dynamics across Paradise, Chico, and other Butte County zones. Geographic zones: Paradise (4 tracts), Chico (prefix `060070001`), Other Butte (remaining `06007` tracts), Rest of CA.
