@@ -1154,7 +1154,7 @@ Examples:
   python 08_spillover_analysis.py --max-donors 500   Limit donor pool
         """,
     )
-    parser.add_argument("--max-donors", type=int, default=1000,
+    parser.add_argument("--max-donors", type=int, default=200,
                         help="Maximum donor tracts for synthetic control")
     parser.add_argument("--exclude-2020", action="store_true",
                         help="Exclude 2020 from analysis (COVID shock)")
