@@ -69,6 +69,7 @@ python 08_spillover_analysis.py --exclude-2020 # Exclude COVID year
 - `06_migration_analysis.py`: IRS SOI county-to-county migration analysis (where displaced residents went)
 - `07_commute_analysis.py`: LODES Origin-Destination commute pattern analysis (pre/post fire)
 - `08_spillover_analysis.py`: Employment and housing vacancy spillover effects on Chico/Butte County
+- `09_homelessness_analysis.py`: HUD Point-in-Time homelessness counts analysis (CA-519 CoC)
 - `run_analysis.py`: Pipeline orchestrator for steps 01-04 (supports `--all`, `--download`, `--process`, `--analyze`, `--visualize`)
 
 **Other Python utilities:**
