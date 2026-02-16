@@ -12,11 +12,13 @@ DATA_ROOT = Path("M:/ParadiseFire")
 
 ANALYSIS_DIR = CODE_DIR / "Analysis"
 DATA_DIR = DATA_ROOT / "data"
-GRAPHS_DIR = DATA_ROOT / "graphs"
+GRAPHS_DIR = ANALYSIS_DIR / "graphs"
+TABLES_DIR = ANALYSIS_DIR / "tables"
 PYTHON_DIR = ANALYSIS_DIR / "python"
 
 # Create directories if they don't exist
-for dir_path in [DATA_DIR, GRAPHS_DIR, DATA_DIR / "lodes_od", DATA_DIR / "lodes_rac", DATA_DIR / "lodes_wac"]:
+for dir_path in [DATA_DIR, GRAPHS_DIR, TABLES_DIR,
+                 DATA_DIR / "lodes_od", DATA_DIR / "lodes_rac", DATA_DIR / "lodes_wac"]:
     try:
         dir_path.mkdir(parents=True, exist_ok=True)
     except OSError:

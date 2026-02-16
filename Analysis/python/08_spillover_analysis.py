@@ -23,6 +23,7 @@ import tempfile
 from config import (
     DATA_DIR,
     GRAPHS_DIR,
+    TABLES_DIR,
     PARADISE_TRACTS,
     BUTTE_COUNTY_FIPS,
     YEARS,
@@ -972,7 +973,7 @@ def run_spillover_analysis(
         # Step 3: Aggregate
         print("\n3. Aggregating employment by zone and year...")
         zone_agg = aggregate_by_zone_year(df)
-        zone_agg.to_csv(DATA_DIR / "spillover_zone_trends.csv", index=False)
+        zone_agg.to_csv(TABLES_DIR / "spillover_zone_trends.csv", index=False)
         results["zone_trends"] = zone_agg
 
         if not event_study_only:
@@ -991,7 +992,7 @@ def run_spillover_analysis(
                 print(f"   Pre-treatment RMSE: {pre_rmse:.1f}")
 
                 zone_key = zone_name.lower().replace(" ", "_")
-                synth_results.to_csv(DATA_DIR / f"spillover_synth_{zone_key}.csv", index=False)
+                synth_results.to_csv(TABLES_DIR / f"spillover_synth_{zone_key}.csv", index=False)
                 weights_df.to_csv(DATA_DIR / f"spillover_synth_weights_{zone_key}.csv", index=False)
                 results[f"synth_{zone_key}"] = synth_results
 
@@ -1008,7 +1009,7 @@ def run_spillover_analysis(
         # Step 5: Event study
         print("\n5. Running event study regressions...")
         event_df = run_event_study(df, treatment_zone=1, control_zone=3)
-        event_df.to_csv(DATA_DIR / "spillover_event_study.csv", index=False)
+        event_df.to_csv(TABLES_DIR / "spillover_event_study.csv", index=False)
         results["event_study"] = event_df
 
         print("\n   Event Study Coefficients (Chico vs Rest of CA):")
@@ -1030,7 +1031,7 @@ def run_spillover_analysis(
             # Step 6: Industry decomposition
             print("\n6. Decomposing by industry...")
             decomp = decompose_by_industry(zone_agg)
-            decomp.to_csv(DATA_DIR / "spillover_industry_decomposition.csv", index=False)
+            decomp.to_csv(TABLES_DIR / "spillover_industry_decomposition.csv", index=False)
             results["decomposition"] = decomp
 
             print("\n   Industry Changes (Pre to Post Fire):")
@@ -1045,7 +1046,7 @@ def run_spillover_analysis(
             # Step 7: Bias quantification
             print("\n7. Quantifying DiD bias...")
             bias = quantify_did_bias(df)
-            bias.to_csv(DATA_DIR / "spillover_bias_estimate.csv", index=False)
+            bias.to_csv(TABLES_DIR / "spillover_bias_estimate.csv", index=False)
             results["bias"] = bias
 
             print("\n   DiD Bias Estimates:")
@@ -1091,7 +1092,7 @@ def run_spillover_analysis(
 
             print("\n3. Aggregating by zone and quarter...")
             vac_agg = aggregate_vacancy_by_zone(vac_df)
-            vac_agg.to_csv(DATA_DIR / "spillover_vacancy_trends.csv", index=False)
+            vac_agg.to_csv(TABLES_DIR / "spillover_vacancy_trends.csv", index=False)
             results["vacancy_trends"] = vac_agg
 
             # Print summary
@@ -1132,6 +1133,7 @@ def run_spillover_analysis(
     print("\n" + "=" * 70)
     print("Spillover analysis complete.")
     print(f"Graphs saved to: {GRAPHS_DIR}")
+    print(f"Tables saved to: {TABLES_DIR}")
     print(f"Data saved to: {DATA_DIR}")
     print("=" * 70)
 

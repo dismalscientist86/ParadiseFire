@@ -10,6 +10,7 @@ from pathlib import Path
 from config import (
     DATA_DIR,
     GRAPHS_DIR,
+    TABLES_DIR,
     LODES_VARS,
     TOP_INDUSTRIES,
     TOP_INDUSTRY_NAMES,
@@ -281,7 +282,7 @@ def run_full_did_analysis(data_type: str = "wac"):
 
     # Save results
     results_df = pd.DataFrame(results)
-    results_path = DATA_DIR / f"did_results_{data_type}.csv"
+    results_path = TABLES_DIR / f"did_results_{data_type}.csv"
     results_df.drop(columns=["model"], errors="ignore").to_csv(results_path, index=False)
     print(f"\nResults saved to {results_path}")
 

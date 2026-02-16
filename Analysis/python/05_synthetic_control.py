@@ -13,6 +13,7 @@ from pathlib import Path
 from config import (
     DATA_DIR,
     GRAPHS_DIR,
+    TABLES_DIR,
     PARADISE_TRACTS,
     BUTTE_COUNTY_FIPS,
 )
@@ -325,7 +326,7 @@ def run_synthetic_control(
         print(f"  than what the synthetic control predicts it would have been.")
 
     # Save results
-    results_path = DATA_DIR / f"synthetic_control_{data_type}_{outcome_var}.csv"
+    results_path = TABLES_DIR / f"synthetic_control_{data_type}_{outcome_var}.csv"
     results.to_csv(results_path, index=False)
     print(f"\nResults saved to {results_path}")
 
@@ -658,7 +659,7 @@ def run_placebo_tests(
         "effect": placebo_effects,
         "pre_rmse": placebo_rmses
     })
-    results_df.to_csv(DATA_DIR / f"placebo_results_{data_type}{suffix}.csv", index=False)
+    results_df.to_csv(TABLES_DIR / f"placebo_results_{data_type}{suffix}.csv", index=False)
 
     return placebo_effects, paradise_effect, p_value
 

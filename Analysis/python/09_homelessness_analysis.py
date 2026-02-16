@@ -18,10 +18,8 @@ import numpy as np
 from pathlib import Path
 
 # Paths
-CODE_DIR = Path(__file__).parent.parent.parent
-DATA_FILE = CODE_DIR / "Analysis" / "data" / "2007-2024-PIT-Counts-by-CoC.xlsb"
-GRAPHS_DIR = CODE_DIR / "Analysis" / "graphs"
-TABLES_DIR = CODE_DIR / "Analysis" / "tables"
+from config import GRAPHS_DIR, TABLES_DIR, ANALYSIS_DIR
+DATA_FILE = ANALYSIS_DIR / "data" / "2007-2024-PIT-Counts-by-CoC.xlsb"
 
 # Constants
 BUTTE_COC = "CA-519"  # Chico, Paradise/Butte County CoC

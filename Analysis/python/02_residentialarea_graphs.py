@@ -1,34 +1,9 @@
-import os
 import pandas as pd
 import matplotlib.pyplot as plt
-
-if os.getlogin() == "sandl305":
-<<<<<<< HEAD:Analysis/python/02_residentialarea_graphs.py
-    # Define the base directory for the project
-    base_dir = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis"
-
-# Define the subdirectories for programs, data, output, logs, and graphs
-programs = os.path.join(base_dir, "programs")
-data = os.path.join(base_dir, "data")
-output = base_dir
-logs = os.path.join(programs, "logs")
-graphs = os.path.join(base_dir, "graphs")
-data_od = os.path.join(data, "lodes_od")
-data_rac = os.path.join(data, "lodes_rac")
-data_wac = os.path.join(data, "lodes_wac")  
-   
-=======
-    programs = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs"
-    data = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data"
-    output = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis"
-    logs = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs"
-    graphs = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\graphs"
-    data_od = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data\lodes_od"
-    data_rac = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data\lodes_rac"
->>>>>>> a5ba01a38c641774b6108ffde781d45d0e186deb:Analysis/python/02_residenitalarea_graphs.py
+from config import DATA_DIR, GRAPHS_DIR
 
 # Read in data
-rac = pd.read_csv(os.path.join(data, "rac_2013_2020.csv"))
+rac = pd.read_csv(DATA_DIR / "rac_2013_2020.csv")
 
 # Print frequency table and crosstab
 print(rac['paradise'].value_counts())
@@ -71,4 +46,4 @@ for var in jobvars:
     ax.legend()
 
     plt.show()
-    fig.savefig(os.path.join(graphs, f'{var}_residentialarea.png'))
+    fig.savefig(GRAPHS_DIR / f'{var}_residentialarea.png')
