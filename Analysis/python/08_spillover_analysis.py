@@ -50,9 +50,9 @@ CHICO_TRACTS = [
     "06007001300", "06007001400",
     "06007001602",
 ]
-FIRE_YEAR = 2018
-PRE_YEARS = [2013, 2014, 2015, 2016, 2017, 2018]
-POST_YEARS = [2019, 2020, 2021, 2022, 2023]
+FIRE_YEAR = 2017  # last clean pre-treatment year
+PRE_YEARS = [2013, 2014, 2015, 2016, 2017]
+POST_YEARS = [2018, 2019, 2020, 2021, 2022, 2023]
 
 ZONE_NAMES = {
     0: "Paradise",
@@ -224,27 +224,23 @@ def build_spillover_synthetic_control(
 
     # Filter out very small tracts
     if 2017 in donor_pivot.columns:
-        donor_pivot = donor_pivot[donor_pivot[2017] >= 50]
+        donor_pivot = donor_pivot[donor_pivot[2017] >= 500]
 
     # Normalize donors to 2017 = 100
-    donor_base = donor_pivot[2017].values.reshape(-1, 1)
-    for col in donor_pivot.columns:
-        donor_pivot[col] = 100 * donor_pivot[col] / donor_base.flatten()
-    donor_pivot = donor_pivot.replace([np.inf, -np.inf], np.nan).dropna()
+    if 2017 in donor_pivot.columns:
+        donor_pivot = donor_pivot.div(donor_pivot[2017], axis=0) * 100
+        donor_pivot = donor_pivot.replace([np.inf, -np.inf], np.nan).dropna()
 
-    # Select donors by pre-treatment trend similarity
+    # Select donors by pre-treatment trajectory RMSE
     pre_cols = [y for y in PRE_YEARS if y in donor_pivot.columns]
     target_pre = target_df[target_df["year"].isin(PRE_YEARS)]["actual"].values
 
-    donor_pre_trends = donor_pivot[pre_cols].apply(
-        lambda row: np.polyfit(range(len(pre_cols)), row.values, 1)[0],
-        axis=1,
-    )
-    target_trend = np.polyfit(range(len(target_pre)), target_pre, 1)[0]
+    donor_pre_matrix = donor_pivot[pre_cols].values
+    donor_rmse = np.sqrt(np.mean((donor_pre_matrix - target_pre) ** 2, axis=1))
+    donor_rmse = pd.Series(donor_rmse, index=donor_pivot.index).dropna()
 
-    trend_diff = np.abs(donor_pre_trends - target_trend).dropna()
-    n_select = min(max_donors, len(trend_diff))
-    best_donors = trend_diff.nsmallest(n_select).index
+    n_select = min(max_donors, len(donor_rmse))
+    best_donors = donor_rmse.nsmallest(n_select).index
     donor_pivot = donor_pivot.loc[best_donors]
 
     print(f"  {zone_name}: {len(donor_pivot)} donors selected")
@@ -265,7 +261,7 @@ def build_spillover_synthetic_control(
     })
     results["gap"] = results["actual"] - results["synthetic"]
     results["period"] = results["year"].apply(
-        lambda y: "pre" if y <= FIRE_YEAR else "post"
+        lambda y: "pre" if y in PRE_YEARS else "post"
     )
 
     pre_gap = results[results["period"] == "pre"]["gap"].mean()
@@ -393,8 +389,8 @@ def decompose_by_industry(zone_year_df: pd.DataFrame, industries: list = None) -
     for ind in industries:
         for zone_id, zone_name in [(0, "Paradise"), (1, "Chico"), (2, "Other Butte")]:
             zone_data = zone_year_df[zone_year_df["zone"] == zone_id]
-            pre_mean = zone_data[zone_data["year"] <= FIRE_YEAR][ind].mean()
-            post_mean = zone_data[zone_data["year"] > FIRE_YEAR][ind].mean()
+            pre_mean = zone_data[zone_data["year"].isin(PRE_YEARS)][ind].mean()
+            post_mean = zone_data[zone_data["year"].isin(POST_YEARS)][ind].mean()
             rows.append({
                 "industry": ind,
                 "industry_name": TOP_INDUSTRY_NAMES.get(ind, ind),
@@ -434,7 +430,7 @@ def quantify_did_bias(df_california: pd.DataFrame) -> pd.DataFrame:
     # DiD with California control: Paradise (zone 0) vs Rest of CA (zone 3)
     ca_df = df_california[df_california["zone"].isin([0, 3])].copy()
     ca_df["paradise"] = (ca_df["zone"] == 0).astype(int)
-    ca_df["post"] = (ca_df["year"] > FIRE_YEAR).astype(int)
+    ca_df["post"] = ca_df["year"].isin(POST_YEARS).astype(int)
     ca_df["did"] = ca_df["post"] * ca_df["paradise"]
 
     outcomes = {
@@ -482,7 +478,7 @@ def quantify_did_bias(df_california: pd.DataFrame) -> pd.DataFrame:
         print("  Original DiD results not found. Running Butte-control DiD...")
         butte_df = df_california[df_california["zone"].isin([0, 1, 2])].copy()
         butte_df["paradise"] = (butte_df["zone"] == 0).astype(int)
-        butte_df["post"] = (butte_df["year"] > FIRE_YEAR).astype(int)
+        butte_df["post"] = butte_df["year"].isin(POST_YEARS).astype(int)
         butte_df["did"] = butte_df["post"] * butte_df["paradise"]
 
         butte_results = []
@@ -686,8 +682,8 @@ def plot_zone_trends(
             ax.plot(zone_data["year"], values, color=colors[zone_id],
                     marker=markers[zone_id], linewidth=2, markersize=6, label=label)
 
-    ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7,
-               linewidth=2, label="Camp Fire")
+    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+               linewidth=2, label="Camp Fire (Nov 2018)")
     if normalize:
         ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5)
         ax.set_ylabel(f"{LODES_VARS.get(outcome_var, outcome_var)} Index (2017=100)", fontsize=12)
@@ -721,8 +717,8 @@ def plot_spillover_synthetic_control(
              markersize=8, label=f"{zone_name} (Actual)")
     ax1.plot(results["year"], results["synthetic"], "s--", linewidth=2.5,
              markersize=8, label=f"Synthetic {zone_name}")
-    ax1.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7,
-                linewidth=2, label="Camp Fire")
+    ax1.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+                linewidth=2, label="Camp Fire (Nov 2018)")
     ax1.axhline(y=100, color="gray", linestyle=":", alpha=0.5)
     ax1.set_xlabel("Year", fontsize=12)
     ax1.set_ylabel("Employment Index (2017=100)", fontsize=12)
@@ -733,7 +729,7 @@ def plot_spillover_synthetic_control(
     # Right: gap
     colors = ["steelblue" if p == "pre" else "firebrick" for p in results["period"]]
     ax2.bar(results["year"], results["gap"], color=colors, alpha=0.7, edgecolor="white")
-    ax2.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7, linewidth=2)
+    ax2.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7, linewidth=2)
     ax2.axhline(y=0, color="black", linewidth=1)
     ax2.set_xlabel("Year", fontsize=12)
     ax2.set_ylabel("Gap (Actual - Synthetic)", fontsize=12)
@@ -765,8 +761,8 @@ def plot_event_study(
         fmt="o-", capsize=4, capthick=1.5, linewidth=2,
         markersize=8, color="#1F77B4",
     )
-    ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7,
-               linewidth=2, label="Camp Fire")
+    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+               linewidth=2, label="Camp Fire (Nov 2018)")
     ax.axhline(y=0, color="black", linewidth=1)
 
     ax.set_xlabel("Year", fontsize=12)
@@ -861,8 +857,8 @@ def plot_net_butte_effect(
             ax.plot(zd["year"], 100 * zd[outcome_var] / zb, linestyle=ls,
                     linewidth=1.5, alpha=0.5, color=color, label=ZONE_NAMES[zone_id])
 
-    ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7,
-               linewidth=2, label="Camp Fire")
+    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+               linewidth=2, label="Camp Fire (Nov 2018)")
     ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5)
     ax.set_xlabel("Year", fontsize=12)
     ax.set_ylabel("Employment Index (2017=100)", fontsize=12)
@@ -921,7 +917,7 @@ def plot_vacancy_trends(
 # ============================================================================
 
 def run_spillover_analysis(
-    max_donors: int = 1000,
+    max_donors: int = 500,
     exclude_2020: bool = False,
     employment_only: bool = False,
     vacancy_only: bool = False,
@@ -1156,7 +1152,7 @@ Examples:
   python 08_spillover_analysis.py --max-donors 500   Limit donor pool
         """,
     )
-    parser.add_argument("--max-donors", type=int, default=200,
+    parser.add_argument("--max-donors", type=int, default=500,
                         help="Maximum donor tracts for synthetic control")
     parser.add_argument("--exclude-2020", action="store_true",
                         help="Exclude 2020 from analysis (COVID shock)")

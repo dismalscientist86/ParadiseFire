@@ -19,9 +19,11 @@ from config import (
 )
 
 # Pre-treatment years (before Nov 2018 fire)
-PRE_YEARS = [2013, 2014, 2015, 2016, 2017, 2018]
-POST_YEARS = [2019, 2020, 2021, 2022, 2023]
-FIRE_YEAR = 2018
+# Note: 2018 LODES is annual data and the Camp Fire was Nov 2018,
+# so 2018 is partially treated — exclude it from pre-period.
+PRE_YEARS = [2013, 2014, 2015, 2016, 2017]
+POST_YEARS = [2018, 2019, 2020, 2021, 2022, 2023]
+FIRE_YEAR = 2017  # last clean pre-treatment year
 
 
 def load_california_tract_data(data_type: str = "wac") -> pd.DataFrame:
@@ -111,9 +113,11 @@ def prepare_synthetic_control_data(df: pd.DataFrame, outcome_var: str = "c000", 
 
     # Keep only tracts with complete data and minimum job count
     donor_pivot = donor_pivot.dropna()
-    # Filter out very small tracts (less than 50 jobs in base year)
+
+    # Filter by size: require at least 500 jobs in base year
     if 2017 in donor_pivot.columns:
-        donor_pivot = donor_pivot[donor_pivot[2017] >= 50]
+        donor_pivot = donor_pivot[donor_pivot[2017] >= 500]
+        print(f"  Donors after minimum size filter (>=500 jobs): {len(donor_pivot)}")
 
     if normalize:
         # Normalize to 2017 = 100 (year before fire)
@@ -123,9 +127,8 @@ def prepare_synthetic_control_data(df: pd.DataFrame, outcome_var: str = "c000", 
             paradise_df["paradise"] = 100 * paradise_df["paradise"] / paradise_base
 
         if base_year in donor_pivot.columns:
-            donor_base = donor_pivot[base_year].values.reshape(-1, 1)
-            for col in donor_pivot.columns:
-                donor_pivot[col] = 100 * donor_pivot[col] / donor_base.flatten()
+            # Normalize all columns at once (avoids view/copy bug with iterative approach)
+            donor_pivot = donor_pivot.div(donor_pivot[base_year], axis=0) * 100
             # Remove tracts with inf/nan after normalization
             donor_pivot = donor_pivot.replace([np.inf, -np.inf], np.nan).dropna()
 
@@ -138,8 +141,7 @@ def prepare_synthetic_control_data(df: pd.DataFrame, outcome_var: str = "c000", 
 def synthetic_control_weights(
     treated_pre: np.ndarray,
     donors_pre: np.ndarray,
-    treated_covariates: np.ndarray = None,
-    donor_covariates: np.ndarray = None,
+
 ) -> np.ndarray:
     """
     Find optimal weights for synthetic control.
@@ -188,7 +190,7 @@ def synthetic_control_weights(
 def run_synthetic_control(
     data_type: str = "wac",
     outcome_var: str = "c000",
-    max_donors: int = 1000,
+    max_donors: int = 500,
     normalize: bool = True,
 ):
     """
@@ -224,39 +226,26 @@ def run_synthetic_control(
     print(f"Paradise pre-treatment values (should be ~100): {paradise_pre_vals.round(1)}")
     print(f"Donor pre-treatment mean (should be ~100): {donor_pivot[pre_cols].mean().mean():.1f}")
 
-    # Select donors based on pre-treatment TREND similarity
-    # With normalized data, all units have similar levels (~100), so match on trends
+    # Select donors based on pre-treatment trajectory similarity
     print(f"\nSelecting best donor matches from {len(donor_pivot)} available...")
 
-    # Calculate pre-treatment trends for donors
-    donor_pre_trends = donor_pivot[pre_cols].apply(
-        lambda row: np.polyfit(range(len(pre_cols)), row.values, 1)[0] if row.notna().all() else np.nan,
-        axis=1
-    )
+    # Score donors by RMSE of pre-treatment trajectory vs Paradise
+    # This directly measures what the optimizer tries to minimize
+    paradise_pre_series = paradise_pre_vals  # shape (T_pre,)
+    donor_pre_matrix = donor_pivot[pre_cols].values  # shape (N, T_pre)
+    donor_rmse = np.sqrt(np.mean((donor_pre_matrix - paradise_pre_series) ** 2, axis=1))
+    donor_rmse = pd.Series(donor_rmse, index=donor_pivot.index)
 
-    # Paradise trend (in normalized terms)
-    paradise_trend = np.polyfit(range(len(paradise_pre_vals)), paradise_pre_vals, 1)[0]
-    print(f"Paradise pre-treatment trend: {paradise_trend:.2f} per year")
+    # Remove NaN
+    donor_rmse = donor_rmse.dropna()
 
-    # Score donors by trend similarity (lower is better)
-    trend_diff = np.abs(donor_pre_trends - paradise_trend)
-
-    # Also consider level match (should be close to 100)
-    donor_pre_means = donor_pivot[pre_cols].mean(axis=1)
-    paradise_pre_mean = paradise_pre_vals.mean()
-    level_diff = np.abs(donor_pre_means - paradise_pre_mean)
-
-    # Combined score: trend similarity + level similarity
-    similarity_score = trend_diff + 0.1 * level_diff
-
-    # Remove any with NaN scores
-    similarity_score = similarity_score.dropna()
-
-    # Select top donors by similarity
-    n_select = min(max_donors, len(similarity_score))
-    best_donors = similarity_score.nsmallest(n_select).index
+    # Select top donors by pre-treatment trajectory similarity
+    n_select = min(max_donors, len(donor_rmse))
+    best_donors = donor_rmse.nsmallest(n_select).index
     donor_pivot = donor_pivot.loc[best_donors]
-    print(f"Selected {len(donor_pivot)} most similar donors")
+    print(f"Selected {len(donor_pivot)} most similar donors (by pre-treatment RMSE)")
+    print(f"Best donor RMSE: {donor_rmse.loc[best_donors].min():.2f}, "
+          f"Worst selected: {donor_rmse.loc[best_donors].max():.2f}")
 
     # Extract pre-treatment data
     pre_years_available = [y for y in PRE_YEARS if y in paradise_df["year"].values]
@@ -296,7 +285,7 @@ def run_synthetic_control(
         "synthetic": synthetic_all,
     })
     results["gap"] = results["paradise"] - results["synthetic"]
-    results["period"] = results["year"].apply(lambda y: "pre" if y <= FIRE_YEAR else "post")
+    results["period"] = results["year"].apply(lambda y: "pre" if y in PRE_YEARS else "post")
 
     # Calculate treatment effect
     pre_gap = results[results["period"] == "pre"]["gap"].mean()
@@ -349,12 +338,12 @@ def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jo
     # Paradise vs Synthetic
     ax.plot(results["year"], results["paradise"], "o-", label="Paradise (Actual)", linewidth=2.5, markersize=8)
     ax.plot(results["year"], results["synthetic"], "s--", label="Synthetic Paradise", linewidth=2.5, markersize=8)
-    ax.axvline(x=FIRE_YEAR + 0.5, color="red", linestyle="--", alpha=0.7, linewidth=2, label="Camp Fire")
+    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7, linewidth=2, label="Camp Fire (Nov 2018)")
     ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5, label="2017 Baseline")
     ax.set_xlabel("Year", fontsize=12)
     ax.set_ylabel(f"{outcome_label} Index (2017=100)", fontsize=12)
     ax.set_title(f"Paradise vs Synthetic Control: {outcome_label}", fontsize=14)
-    ax.legend(loc="upper right")
+    ax.legend(loc="lower left")
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
@@ -407,7 +396,7 @@ def plot_paradise_vs_donors(
             label="Paradise", zorder=3)
 
     # Add fire line
-    ax.axvline(x=FIRE_YEAR + 0.5, color="orange", linestyle="--", linewidth=2,
+    ax.axvline(x=2017.5, color="orange", linestyle="--", linewidth=2,
                alpha=0.8, label="Camp Fire (Nov 2018)", zorder=2)
 
     # Add baseline reference
@@ -475,14 +464,11 @@ def run_placebo_tests(
     print("\nCalculating Paradise effect...")
     paradise_pre = paradise_df[paradise_df["year"].isin(pre_years)]["paradise"].values
 
-    # Select similar donors for Paradise (same as main analysis)
-    donor_pre_trends = donor_pivot[pre_years].apply(
-        lambda row: np.polyfit(range(len(pre_years)), row.values, 1)[0] if row.notna().all() else np.nan,
-        axis=1
-    )
-    paradise_trend = np.polyfit(range(len(paradise_pre)), paradise_pre, 1)[0]
-    trend_diff = np.abs(donor_pre_trends - paradise_trend).dropna()
-    best_donors = trend_diff.nsmallest(500).index
+    # Select similar donors for Paradise (same as main analysis - by pre-treatment RMSE)
+    donor_pre_matrix = donor_pivot[pre_years].values
+    donor_rmse = np.sqrt(np.mean((donor_pre_matrix - paradise_pre) ** 2, axis=1))
+    donor_rmse = pd.Series(donor_rmse, index=donor_pivot.index).dropna()
+    best_donors = donor_rmse.nsmallest(500).index
     paradise_donor_pool = donor_pivot.loc[best_donors]
 
     # Get Paradise weights and effect
@@ -530,16 +516,13 @@ def run_placebo_tests(
             # Create donor pool excluding this tract
             other_donors = donor_pivot.drop(placebo_tract)
 
-            # Select donors similar to this placebo tract
-            other_trends = other_donors[pre_years].apply(
-                lambda row: np.polyfit(range(len(pre_years)), row.values, 1)[0] if row.notna().all() else np.nan,
-                axis=1
-            )
-            placebo_trend = np.polyfit(range(len(placebo_pre)), placebo_pre, 1)[0]
-            trend_diff = np.abs(other_trends - placebo_trend).dropna()
+            # Select donors similar to this placebo tract (by pre-treatment RMSE)
+            other_pre_matrix = other_donors[pre_years].values
+            other_rmse = np.sqrt(np.mean((other_pre_matrix - placebo_pre) ** 2, axis=1))
+            other_rmse = pd.Series(other_rmse, index=other_donors.index).dropna()
 
-            n_select = min(max_donors_per_placebo, len(trend_diff))
-            selected_donors = trend_diff.nsmallest(n_select).index
+            n_select = min(max_donors_per_placebo, len(other_rmse))
+            selected_donors = other_rmse.nsmallest(n_select).index
             placebo_donor_pool = other_donors.loc[selected_donors]
 
             # Find weights using pre-treatment data
@@ -670,7 +653,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Synthetic Control Analysis")
     parser.add_argument("--data", choices=["wac", "rac"], default="wac")
     parser.add_argument("--outcome", default="c000", help="Outcome variable")
-    parser.add_argument("--max-donors", type=int, default=1000)
+    parser.add_argument("--max-donors", type=int, default=500)
     parser.add_argument("--placebo", action="store_true", help="Run placebo tests")
     parser.add_argument("--n-placebos", type=int, default=100, help="Number of placebo tests")
     parser.add_argument("--exclude-2020", action="store_true",
