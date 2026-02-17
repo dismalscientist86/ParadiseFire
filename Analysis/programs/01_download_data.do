@@ -4,9 +4,8 @@
 *and puts it into subfolders within the $data directory. These still
 *need to be unzipped after downloading. I couldn't figure out how to 
 *do that from within Stata (running on Windows)
-*Created by: Dani Sandler
 *Created on: 5/27/2022
-*Modifications: 6/3/22 - DHS - Add dated log file
+*Modifications: 6/3/22 - Add dated log file
 ******************************/
 clear
 capture log close

@@ -3,15 +3,9 @@
 *Purpose: This program creates bar graphs with number of Paradise employees by subcategory 
 	* years 2013-2019
 *Created on: 7/01/2022
-*Created by: Gabriela Lahera
 ***************************************/
 
-if c(username)=="sandl305"{
-	do	"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\03_residence_area.do"
-}
-if c(username)!="sandl305"{
-	do "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs\03_residence_area.do"
-}
+do 03_residence_area.do
 
 
 ***********[reference]************
@@ -22,7 +16,7 @@ if c(username)!="sandl305"{
 
 net install grc1leg, from (http://www.stata.com/users/vwiggins)
 
-cd "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\graphs\rac_pchange"
+cd "$graphs\rac_pchange"
 
 *Age
 	graph twoway (connected ca01_pctchg year if paradise==1) (connected ca01_pctchg year if paradise==0), xlabel(2013(1)2019) ytitle(Percent change) title(29 and Younger) legend(label(1 "Paradise") label(2 "Rest of Butte County")) saving(pctchg_age_1,replace)
@@ -88,12 +82,7 @@ graph export ${graphs}/pctchg_sex_2013-2019_rac.jpg, replace
 ***************************************************************************
 *Bring in Work area data
 
-if c(username)=="sandl305"{
-	do	"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\04_work_area.do"
-}
-if c(username)!="sandl305"{
-	do "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs\04_work_area.do"
-}
+do 04_work_area.do
 
 
 *Age

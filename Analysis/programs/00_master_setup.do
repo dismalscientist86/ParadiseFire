@@ -1,10 +1,8 @@
 /***************************************
 *Filename: 00_master_setup.do
 *Purpose: Master file for the Paradise Fire research project.
-* Sets file paths correctly for Dani's (c(username)=sandl305), and 
-* Gabby's (c(username)=???) computers
+* Sets file paths based on c(username). Add a new block for your username.
 *Created on: 5/27/2022
-*Created by: Dani Sandler
 *Modifications:
 ***************************************/
 
@@ -17,21 +15,18 @@ set seed 39281
 
 global today : di %tdCY.N.D date("$S_DATE", "DMY")
 
-if c(username)=="sandl305"{
-	global programs "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs"
-	global data "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\data"
-	global output "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\"
-	global logs "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\logs"
-	global graphs "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\graphs"
-}
+* Set paths based on username. Add your own block here.
+* Example:
+* if c(username)=="yourusername"{
+*     global programs "C:\Users\yourusername\Documents\GitHub\ParadiseFire\Analysis\programs"
+*     global data "C:\Users\yourusername\Documents\GitHub\ParadiseFire\Analysis\data"
+*     global output "C:\Users\yourusername\Documents\GitHub\ParadiseFire\Analysis\"
+*     global logs "C:\Users\yourusername\Documents\GitHub\ParadiseFire\Analysis\programs\logs"
+*     global graphs "C:\Users\yourusername\Documents\GitHub\ParadiseFire\Analysis\graphs"
+* }
 
-if c(username)!="sandl305"{
-	global programs "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs"
-	global data "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\data"
-	global output "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis"
-	global logs "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs\logs"
-	global graphs "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\graphs"
-}
+display as error "ERROR: Set your username and paths in 00_master_setup.do"
+exit 198
 
 
 

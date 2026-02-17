@@ -3,12 +3,7 @@
 clear
 capture log close
 
-if c(username)=="sandl305"{
-	do "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\00_master_setup.do"
-}
-if c(username)!="sandl305"{
-	do "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs\00_master_setup.do"
-}
+do 00_master_setup.do
 
  use $data/wac_2013_2019.dta
 *create difference in difference variable

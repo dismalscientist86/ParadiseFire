@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jan 31 16:42:22 2024
-
-@author: sandl305
+Legacy migration data processing script.
+Replaced by 06_migration_analysis.py
 """
 
 import os
@@ -12,10 +11,9 @@ import chardet
 import logging
 
 
-
-if os.getlogin() == "sandl305":
-    # Define the base directory for the project
-    base_dir = r"C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis"
+# Define the base directory for the project
+# UPDATE THIS PATH for your machine:
+base_dir = os.path.join(os.path.dirname(__file__), "..", "..")
 
 # Define the subdirectories for programs, data, output, logs, and graphs
 programs = os.path.join(base_dir, "programs")

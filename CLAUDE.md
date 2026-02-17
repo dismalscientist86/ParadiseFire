@@ -118,7 +118,7 @@ do 07_difference_in_difference.do  # Run diff-in-diff regressions
 
 ## Path Configuration
 
-**Python executable:** `/c/Users/Sandler/anaconda3/python.exe` (Anaconda installation)
+**Python executable:** Anaconda Python (see `config.py` or user's local setup)
 
 **Python (`config.py`):**
 - `CODE_DIR`: Auto-detected from script location (Dropbox)
@@ -126,11 +126,7 @@ do 07_difference_in_difference.do  # Run diff-in-diff regressions
 - Adjust `DATA_ROOT` if running on a different machine
 
 **Stata (`00_master_setup.do`):**
-Sets global macros based on `c(username)`:
-- `sandl305` (Dani Sandler): Uses `C:\Users\sandl305\Documents\GitHub\ParadiseFire\`
-- Others (Gabriela Lahera): Uses `C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\`
-
-To add a new user, add a conditional block in `00_master_setup.do`.
+Sets global macros based on `c(username)`. Each collaborator has a conditional block setting file paths. To add a new user, add a conditional block in `00_master_setup.do`.
 
 ## Methodology
 

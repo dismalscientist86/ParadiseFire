@@ -3,19 +3,12 @@
 *Purpose: This program creates bar graphs with number of Paradise employees by subcategory
 	for years 2017, 2018, and 2019
 *Created on: 6/24/2022
-*Created by: Gabriela Lahera
-*Modifications: 7/1/22 - DHS - Added header
-							   Added 00_master_setup.do at start
-							   Used macros to save paths
-							   Removed .gph save
-							   Added graphs for both rac & wac
+*Modifications:
+*	7/1/22 - Added header, added 00_master_setup.do at start,
+*	used macros to save paths, removed .gph save,
+*	added graphs for both rac & wac
 ***************************************/
-if c(username)=="sandl305"{
-	do "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\00_master_setup.do"
-}
-if c(username)!="sandl305"{
-	do "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs\00_master_setup.do"
-}
+do 00_master_setup.do
 
 capture log close
 log using $logs/05_Bar_graphs_subgroups$today.log, replace

@@ -3,9 +3,8 @@
 *Purpose: To bring in the .csv data, keep only 
 Butte county, and save as Stata datasets
 *Created on: 6/3/2022
-*Created by: Dani Sandler
 *Modifications:
-*	6/10/22 - DHS - Change to loop for 2017-2019
+*	6/10/22 - Change to loop for 2017-2019
 					Add extract of RAC and WAC datasets
 ***************************************/
 clear

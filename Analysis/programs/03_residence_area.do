@@ -3,7 +3,6 @@
 *Purpose: This program appends the three years of residence areas,
 *	applies the "Paradise" dummy and other data cleaning tasks
 *Created on: 6/10/2022
-*Created by: Dani Sandler
 *Modifications:
 ***************************************/
 clear

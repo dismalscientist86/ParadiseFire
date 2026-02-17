@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Feb  2 13:47:27 2024
-
-@author: sandl305
+Legacy IRS SOI migration analysis script.
+Replaced by 06_migration_analysis.py
 """
 
 # Import pandas library

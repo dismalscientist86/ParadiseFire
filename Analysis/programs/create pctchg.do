@@ -63,7 +63,7 @@ forvalues i = 1 / 2 {
 
 net install grc1leg, from (http://www.stata.com/users/vwiggins)
 
-cd "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\graphs\pchange"
+cd "$graphs\pchange"
 
 *Age
 	graph twoway (connected ca01_pctchg year if paradise==1) (connected ca01_pctchg year if paradise==0), xlabel(2017(1)2019) ytitle(Percent change) title(29 and Younger) legend(label(1 "Paradise") label(2 "Rest of Butte County")) saving(pctchg_age_1)

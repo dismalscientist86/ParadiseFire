@@ -1,6 +1,6 @@
 ** Total jobs by subgroup 
 
-cd "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\graphs"
+cd "$graphs"
 *Change in jobs per age group 
 graph bar (sum) ca01 ca02 ca03 if paradise == 1, over (year) title("Total Jobs per age group") legend (label(1 "29 and younger") label(2 "30 to 54") label (3 "55 and older")) saving(total_jobs_per_age)
 graph export total_jobs_per_age.jpg

@@ -3,19 +3,13 @@
 *Purpose: This program appends the three years of residence areas,
 *	applies the "Paradise" dummy and other data cleaning tasks
 *Created on: 6/10/2022
-*Created by: Dani Sandler
-*Modifications:7/1/22 - GL - Added data from 2013 tp 2016
-							*Added percent change varibles 
+*Modifications:
+*	7/1/22 - Added data from 2013 to 2016, added percent change variables
 ***************************************
 clear
 capture log close
 
-if c(username)=="sandl305"{
-	do "C:\Users\sandl305\Documents\GitHub\ParadiseFire\Analysis\programs\00_master_setup.do"
-}
-if c(username)!="sandl305"{
-	do "C:\Users\Gabriela.Lahera\Documents\GitHub\ParadiseFire\Analysis\programs\00_master_setup.do"
-}
+do 00_master_setup.do
 
 log using $logs/03_residence_area$today.log, replace
 
