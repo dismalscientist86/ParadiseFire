@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.29)  19 MAR 2026 15:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.29)  19 MAR 2026 15:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1106,7 +1106,7 @@ hkerncmss.fd
 File: ot1mathkerncmss.fd 2020/01/31 Fontinst v1.933 font definitions for OT1/ma
 thkerncmss.
 )
-<../GoogleEarth/Fire_Damage_Map.jpg, id=100, 641.39626pt x 322.20375pt>
+<../GoogleEarth/Fire_Damage_Map.jpg, id=94, 641.39626pt x 322.20375pt>
 File: ../GoogleEarth/Fire_Damage_Map.jpg Graphic file (type jpg)
 <use ../GoogleEarth/Fire_Damage_Map.jpg>
 Package pdftex.def Info: ../GoogleEarth/Fire_Damage_Map.jpg  used on input line
@@ -1115,19 +1115,19 @@ Package pdftex.def Info: ../GoogleEarth/Fire_Damage_Map.jpg  used on input line
  [3
 
  <../GoogleEarth/Fire_Damage_Map.jpg>]
-<../GoogleEarth/Paradise_Sept2018.jpg, id=107, 1577.14218pt x 981.6675pt>
+<../GoogleEarth/Paradise_Sept2018.jpg, id=101, 1577.14218pt x 981.6675pt>
 File: ../GoogleEarth/Paradise_Sept2018.jpg Graphic file (type jpg)
 <use ../GoogleEarth/Paradise_Sept2018.jpg>
 Package pdftex.def Info: ../GoogleEarth/Paradise_Sept2018.jpg  used on input li
 ne 117.
 (pdftex.def)             Requested size: 138.15843pt x 85.99455pt.
-<../GoogleEarth/Paradise_Dec2018.jpg, id=108, 1577.14218pt x 981.6675pt>
+<../GoogleEarth/Paradise_Dec2018.jpg, id=102, 1577.14218pt x 981.6675pt>
 File: ../GoogleEarth/Paradise_Dec2018.jpg Graphic file (type jpg)
 <use ../GoogleEarth/Paradise_Dec2018.jpg>
 Package pdftex.def Info: ../GoogleEarth/Paradise_Dec2018.jpg  used on input lin
 e 117.
 (pdftex.def)             Requested size: 138.15843pt x 85.99455pt.
-<../GoogleEarth/Paradise_May2023.jpg, id=109, 1577.14218pt x 981.6675pt>
+<../GoogleEarth/Paradise_May2023.jpg, id=103, 1577.14218pt x 981.6675pt>
 File: ../GoogleEarth/Paradise_May2023.jpg Graphic file (type jpg)
 <use ../GoogleEarth/Paradise_May2023.jpg>
 Package pdftex.def Info: ../GoogleEarth/Paradise_May2023.jpg  used on input lin
@@ -1141,7 +1141,7 @@ e 117.
 ] [6
 
 ]
-<../Analysis/data/reference/ButteCo_TractMap.pdf, id=125, 2603.7275pt x 2312.64
+<../Analysis/data/reference/ButteCo_TractMap.pdf, id=119, 2603.7275pt x 2312.64
 pt>
 File: ../Analysis/data/reference/ButteCo_TractMap.pdf Graphic file (type pdf)
 <use ../Analysis/data/reference/ButteCo_TractMap.pdf>
@@ -1190,7 +1190,7 @@ LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <10.95> not available
 ] [11
 
 ]
-<../Analysis/graphs/descriptive/total_jobs_trend_wac.png, id=270, 1003.1076pt x
+<../Analysis/graphs/descriptive/total_jobs_trend_wac.png, id=264, 1003.1076pt x
  352.1958pt>
 File: ../Analysis/graphs/descriptive/total_jobs_trend_wac.png Graphic file (typ
 e png)
@@ -1201,7 +1201,7 @@ g  used on input line 290.
  [12
 
  <../Analysis/graphs/descriptive/total_jobs_trend_wac.png>]
-<../Analysis/graphs/synthetic_control/synthetic_control.png, id=278, 714.0276pt
+<../Analysis/graphs/synthetic_control/synthetic_control.png, id=272, 714.0276pt
  x 423.984pt>
 File: ../Analysis/graphs/synthetic_control/synthetic_control.png Graphic file (
 type png)
@@ -1215,7 +1215,7 @@ Package pdftex.def Info: ../Analysis/graphs/synthetic_control/synthetic_control
  <../Analysis/graphs/synthetic_control/synthetic_control.png>] [14
 
 ]
-<../Analysis/graphs/synthetic_control/paradise_vs_donors.png, id=290, 858.5676p
+<../Analysis/graphs/synthetic_control/paradise_vs_donors.png, id=284, 858.5676p
 t x 496.254pt>
 File: ../Analysis/graphs/synthetic_control/paradise_vs_donors.png Graphic file 
 (type png)
@@ -1226,7 +1226,7 @@ s.png  used on input line 325.
  [15
 
  <../Analysis/graphs/synthetic_control/paradise_vs_donors.png>]
-<../Analysis/graphs/synthetic_control/placebo_tests.png, id=297, 1004.0712pt x 
+<../Analysis/graphs/synthetic_control/placebo_tests.png, id=291, 1004.0712pt x 
 352.1958pt>
 File: ../Analysis/graphs/synthetic_control/placebo_tests.png Graphic file (type
  png)
@@ -1237,7 +1237,7 @@ Package pdftex.def Info: ../Analysis/graphs/synthetic_control/placebo_tests.png
  [16
 
  <../Analysis/graphs/synthetic_control/placebo_tests.png>]
-<../Analysis/graphs/spillover/spillover_synthetic_chico.png, id=306, 1003.1076p
+<../Analysis/graphs/spillover/spillover_synthetic_chico.png, id=300, 1003.1076p
 t x 351.714pt>
 File: ../Analysis/graphs/spillover/spillover_synthetic_chico.png Graphic file (
 type png)
@@ -1254,7 +1254,7 @@ type png)
 Package pdftex.def Info: ../Analysis/graphs/spillover/spillover_synthetic_chico
 .png  used on input line 385.
 (pdftex.def)             Requested size: 215.86292pt x 75.6868pt.
-<../Analysis/graphs/spillover/spillover_synthetic_other_butte.png, id=312, 1003
+<../Analysis/graphs/spillover/spillover_synthetic_other_butte.png, id=306, 1003
 .1076pt x 351.714pt>
 File: ../Analysis/graphs/spillover/spillover_synthetic_other_butte.png Graphic 
 file (type png)
@@ -1267,7 +1267,7 @@ _butte.png  used on input line 385.
  <../Analysis/graphs/spillover/spillover_synthetic_other_butte.png>] [19
 
 ]
-<../Analysis/graphs/migration/migration_pre_post_comparison.png, id=325, 1148.6
+<../Analysis/graphs/migration/migration_pre_post_comparison.png, id=319, 1148.6
 112pt x 569.0058pt>
 File: ../Analysis/graphs/migration/migration_pre_post_comparison.png Graphic fi
 le (type png)
@@ -1278,7 +1278,7 @@ ison.png  used on input line 411.
  [20
 
  <../Analysis/graphs/migration/migration_pre_post_comparison.png>]
-<../Analysis/graphs/migration/migration_by_region.png, id=331, 1147.6476pt x 42
+<../Analysis/graphs/migration/migration_by_region.png, id=325, 1147.6476pt x 42
 4.4658pt>
 File: ../Analysis/graphs/migration/migration_by_region.png Graphic file (type p
 ng)
@@ -1289,35 +1289,30 @@ used on input line 433.
  [21
 
  <../Analysis/graphs/migration/migration_by_region.png>]
-<../Analysis/graphs/homelessness/homelessness_pit_counts.png, id=338, 714.9912p
+[22
+
+] [23
+
+] [24
+
+]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\translate ' on input line 485.
+
+<../Analysis/graphs/homelessness/homelessness_pit_counts.png, id=382, 714.9912p
 t x 569.0058pt>
 File: ../Analysis/graphs/homelessness/homelessness_pit_counts.png Graphic file 
 (type png)
 <use ../Analysis/graphs/homelessness/homelessness_pit_counts.png>
 Package pdftex.def Info: ../Analysis/graphs/homelessness/homelessness_pit_count
-s.png  used on input line 447.
+s.png  used on input line 497.
 (pdftex.def)             Requested size: 178.75827pt x 142.25978pt.
+[25
 
-[22
-
- <../Analysis/graphs/homelessness/homelessness_pit_counts.png>] [23
-
-]
-
-Class beamer Warning: Frame text is shrunk by a factor of 16.11633 percent inst
-ead of 5 percent on input line 504.
-
-[24
-
-] [25
-
-] [26
+ <../Analysis/graphs/homelessness/homelessness_pit_counts.png>] [26
 
 ]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\translate ' on input line 538.
-
 [27
 
 ] [28
@@ -1340,14 +1335,14 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `slides.out' has not changed.
-(rerunfilecheck)             Checksum: 01B9E4E59B265742DF1431725EC4A1DE;1054.
+(rerunfilecheck)             Checksum: 85B3FADA84BCA3CE5309AA7E7166BF0E;950.
  ) 
 Here is how much of TeX's memory you used:
- 27716 strings out of 474485
- 595027 string characters out of 5742789
+ 27704 strings out of 474485
+ 594703 string characters out of 5742789
  1939542 words of memory out of 5000000
- 49421 multiletter control sequences out of 15000+600000
- 579358 words of font info for 105 fonts, out of 8000000 for 9000
+ 49410 multiletter control sequences out of 15000+600000
+ 579002 words of font info for 104 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,12n,123p,383b,1031s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Sandler\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tc
@@ -1366,9 +1361,9 @@ X/fonts/type1/public/amsfonts/cm/cmssi12.pfb><C:/Users/Sandler/AppData/Local/Pr
 ograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmssi8.pfb><C:/Users/Sandler/AppDa
 ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Sa
 ndler/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on slides.pdf (29 pages, 7851945 bytes).
+Output written on slides.pdf (29 pages, 7848013 bytes).
 PDF statistics:
- 506 PDF objects out of 1000 (max. 8388607)
- 69 named destinations out of 1000 (max. 500000)
- 433 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 489 PDF objects out of 1000 (max. 8388607)
+ 68 named destinations out of 1000 (max. 500000)
+ 389 words of extra memory for PDF output out of 10000 (max. 10000000)
 
