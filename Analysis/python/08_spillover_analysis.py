@@ -12,7 +12,6 @@ dynamics across zones before and after the fire.
 """
 import pandas as pd
 import numpy as np
-from scipy.optimize import minimize
 import statsmodels.formula.api as smf
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -31,6 +30,7 @@ from config import (
     TOP_INDUSTRIES,
     TOP_INDUSTRY_NAMES,
 )
+from utils import load_california_tract_data, synthetic_control_weights
 
 # ============================================================================
 # Constants
@@ -69,56 +69,6 @@ USPS_TEMP_DIR = DATA_DIR / "usps_temp"
 # ============================================================================
 # Part A: Employment Spillovers (LODES WAC)
 # ============================================================================
-
-def load_california_tract_data(data_type: str = "wac") -> pd.DataFrame:
-    """
-    Load and aggregate California LODES data to tract-year level.
-
-    Mirrors 05_synthetic_control.load_california_tract_data.
-    Processes raw CSV files to get all California tracts, not just Butte County.
-    """
-    if data_type == "wac":
-        data_dir = DATA_DIR / "lodes_wac"
-        geocode_col = "w_geocode"
-    else:
-        data_dir = DATA_DIR / "lodes_rac"
-        geocode_col = "h_geocode"
-
-    all_data = []
-
-    for year in range(2013, 2024):
-        filepath = data_dir / f"ca_{data_type}_S000_JT00_{year}.csv"
-        if not filepath.exists():
-            print(f"  Skipping {year} - file not found")
-            continue
-
-        print(f"  Loading {year}...")
-        df = pd.read_csv(filepath, dtype={geocode_col: str})
-        df.columns = df.columns.str.lower()
-
-        # Ensure geocode is properly formatted
-        df[geocode_col] = df[geocode_col].str.zfill(15)
-
-        # Extract tract (11 digits)
-        tract_col = geocode_col.replace("geocode", "tract")
-        df[tract_col] = df[geocode_col].str[:11]
-
-        # Aggregate to tract level
-        count_cols = [c for c in df.columns if c.startswith("c") and c != "createdate"]
-        tract_agg = df.groupby(tract_col)[count_cols].sum().reset_index()
-        tract_agg["year"] = year
-
-        all_data.append(tract_agg)
-
-    result = pd.concat(all_data, ignore_index=True)
-
-    # Rename tract column consistently
-    if "w_tract" in result.columns:
-        result = result.rename(columns={"w_tract": "tract"})
-    elif "h_tract" in result.columns:
-        result = result.rename(columns={"h_tract": "tract"})
-
-    return result
 
 
 def classify_tracts(df: pd.DataFrame) -> pd.DataFrame:
@@ -247,7 +197,7 @@ def build_spillover_synthetic_control(
 
     # Optimize weights
     donors_pre = donor_pivot[pre_cols].values
-    weights = _optimize_weights(target_pre, donors_pre)
+    weights = synthetic_control_weights(target_pre, donors_pre)
 
     # Compute synthetic for all years
     all_years = sorted(target_df["year"].unique())
@@ -276,25 +226,6 @@ def build_spillover_synthetic_control(
 
     return results, weights_df, treatment_effect
 
-
-def _optimize_weights(treated_pre: np.ndarray, donors_pre: np.ndarray) -> np.ndarray:
-    """Find optimal synthetic control weights via SLSQP."""
-    n_donors = donors_pre.shape[0]
-
-    def objective(w):
-        synthetic = donors_pre.T @ w
-        return np.mean((treated_pre - synthetic) ** 2)
-
-    constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1}]
-    bounds = [(0, 1) for _ in range(n_donors)]
-    w0 = np.ones(n_donors) / n_donors
-
-    result = minimize(
-        objective, w0, method="SLSQP",
-        bounds=bounds, constraints=constraints,
-        options={"maxiter": 1000, "ftol": 1e-10},
-    )
-    return result.x
 
 
 def run_event_study(
@@ -462,8 +393,8 @@ def quantify_did_bias(df_california: pd.DataFrame) -> pd.DataFrame:
 
     ca_results_df = pd.DataFrame(ca_results)
 
-    # Load original Butte-control results if available
-    butte_results_path = DATA_DIR / "did_results_wac.csv"
+    # Load original Butte-control results if available (saved by 03_analysis.py)
+    butte_results_path = TABLES_DIR / "did_results_wac.csv"
     if butte_results_path.exists():
         butte_df = pd.read_csv(butte_results_path)
         # Merge
@@ -682,7 +613,7 @@ def plot_zone_trends(
             ax.plot(zone_data["year"], values, color=colors[zone_id],
                     marker=markers[zone_id], linewidth=2, markersize=6, label=label)
 
-    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+    ax.axvline(x=2018.75, color="red", linestyle="--", alpha=0.7,
                linewidth=2, label="Camp Fire (Nov 2018)")
     if normalize:
         ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5)
@@ -717,7 +648,7 @@ def plot_spillover_synthetic_control(
              markersize=8, label=f"{zone_name} (Actual)")
     ax1.plot(results["year"], results["synthetic"], "s--", linewidth=2.5,
              markersize=8, label=f"Synthetic {zone_name}")
-    ax1.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+    ax1.axvline(x=2018.75, color="red", linestyle="--", alpha=0.7,
                 linewidth=2, label="Camp Fire (Nov 2018)")
     ax1.axhline(y=100, color="gray", linestyle=":", alpha=0.5)
     ax1.set_xlabel("Year", fontsize=12)
@@ -729,7 +660,7 @@ def plot_spillover_synthetic_control(
     # Right: gap
     colors = ["steelblue" if p == "pre" else "firebrick" for p in results["period"]]
     ax2.bar(results["year"], results["gap"], color=colors, alpha=0.7, edgecolor="white")
-    ax2.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7, linewidth=2)
+    ax2.axvline(x=2018.75, color="red", linestyle="--", alpha=0.7, linewidth=2)
     ax2.axhline(y=0, color="black", linewidth=1)
     ax2.set_xlabel("Year", fontsize=12)
     ax2.set_ylabel("Gap (Actual - Synthetic)", fontsize=12)
@@ -761,7 +692,7 @@ def plot_event_study(
         fmt="o-", capsize=4, capthick=1.5, linewidth=2,
         markersize=8, color="#1F77B4",
     )
-    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+    ax.axvline(x=2018.75, color="red", linestyle="--", alpha=0.7,
                linewidth=2, label="Camp Fire (Nov 2018)")
     ax.axhline(y=0, color="black", linewidth=1)
 
@@ -857,7 +788,7 @@ def plot_net_butte_effect(
             ax.plot(zd["year"], 100 * zd[outcome_var] / zb, linestyle=ls,
                     linewidth=1.5, alpha=0.5, color=color, label=ZONE_NAMES[zone_id])
 
-    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7,
+    ax.axvline(x=2018.75, color="red", linestyle="--", alpha=0.7,
                linewidth=2, label="Camp Fire (Nov 2018)")
     ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5)
     ax.set_xlabel("Year", fontsize=12)
