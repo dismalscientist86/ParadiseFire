@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 run_analysis.py
-Main entry point for the Paradise Fire analysis pipeline.
+Main entry point for the core Paradise Fire analysis pipeline (steps 01-04).
 
 Usage:
     python run_analysis.py --all              # Run full pipeline
@@ -9,6 +9,24 @@ Usage:
     python run_analysis.py --process          # Process data only
     python run_analysis.py --analyze          # Run analysis only
     python run_analysis.py --visualize        # Generate visualizations only
+
+Additional standalone analyses (not orchestrated here — run separately):
+    python 05_synthetic_control.py --data wac        # Synthetic control
+    python 05_synthetic_control.py --placebo          # Placebo tests
+    python 05_synthetic_control.py --placebo --exclude-2020  # Exclude COVID
+    python 06_migration_analysis.py                   # IRS SOI migration
+    python 07_commute_analysis.py                     # OD commute patterns
+    python 08_spillover_analysis.py                   # Employment + vacancy spillovers
+    python 09_homelessness_analysis.py                # HUD PIT homelessness counts
+
+Recommended order for first run:
+    1. python run_analysis.py --all           (downloads + processes + core analysis)
+    2. python 05_synthetic_control.py --data wac
+    3. python 05_synthetic_control.py --placebo
+    4. python 06_migration_analysis.py        (downloads IRS SOI data separately)
+    5. python 07_commute_analysis.py          (downloads LODES OD data separately)
+    6. python 08_spillover_analysis.py        (requires step 1 WAC data + USPS data on M:/)
+    7. python 09_homelessness_analysis.py     (requires HUD XLSB file in Analysis/data/)
 """
 import argparse
 import sys
