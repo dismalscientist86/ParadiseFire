@@ -21,7 +21,7 @@ import tempfile
 
 from config import (
     DATA_DIR,
-    GRAPHS_DIR,
+    GRAPHS_SPILLOVER,
     TABLES_DIR,
     PARADISE_TRACTS,
     BUTTE_COUNTY_FIPS,
@@ -628,7 +628,7 @@ def plot_zone_trends(
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / f"spillover_zone_trends_{outcome_var}.png"
+        filepath = GRAPHS_SPILLOVER / f"spillover_zone_trends_{outcome_var}.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"  Saved: {filepath}")
 
@@ -670,7 +670,7 @@ def plot_spillover_synthetic_control(
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / f"spillover_synthetic_{zone_name.lower().replace(' ', '_')}.png"
+        filepath = GRAPHS_SPILLOVER / f"spillover_synthetic_{zone_name.lower().replace(' ', '_')}.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"  Saved: {filepath}")
 
@@ -704,7 +704,7 @@ def plot_event_study(
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "spillover_event_study.png"
+        filepath = GRAPHS_SPILLOVER / "spillover_event_study.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"  Saved: {filepath}")
 
@@ -744,7 +744,7 @@ def plot_industry_decomposition(decomp_df: pd.DataFrame, save: bool = True) -> p
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "spillover_industry_decomposition.png"
+        filepath = GRAPHS_SPILLOVER / "spillover_industry_decomposition.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"  Saved: {filepath}")
 
@@ -799,7 +799,7 @@ def plot_net_butte_effect(
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "spillover_net_butte.png"
+        filepath = GRAPHS_SPILLOVER / "spillover_net_butte.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"  Saved: {filepath}")
 
@@ -836,7 +836,7 @@ def plot_vacancy_trends(
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / filename
+        filepath = GRAPHS_SPILLOVER / filename
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"  Saved: {filepath}")
 

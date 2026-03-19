@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from config import (
     DATA_DIR,
-    GRAPHS_DIR,
+    GRAPHS_SYNTH,
     TABLES_DIR,
     PARADISE_TRACTS,
     BUTTE_COUNTY_FIPS,
@@ -251,7 +251,7 @@ def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jo
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "synthetic_control.png"
+        filepath = GRAPHS_SYNTH / "synthetic_control.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -316,7 +316,7 @@ def plot_paradise_vs_donors(
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "paradise_vs_donors.png"
+        filepath = GRAPHS_SYNTH / "paradise_vs_donors.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -535,7 +535,7 @@ def run_placebo_tests(
     suffix = ""
     if exclude_years:
         suffix = f"_excl{'_'.join(str(y) for y in exclude_years)}"
-    filepath = GRAPHS_DIR / f"placebo_tests{suffix}.png"
+    filepath = GRAPHS_SYNTH / f"placebo_tests{suffix}.png"
     plt.savefig(filepath, dpi=150, bbox_inches="tight")
     print(f"\nSaved: {filepath}")
 

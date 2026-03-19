@@ -11,6 +11,7 @@ from pathlib import Path
 from config import (
     DATA_DIR,
     GRAPHS_DIR,
+    GRAPHS_DESCRIPTIVE,
     LODES_VARS,
     TOP_INDUSTRIES,
     TOP_INDUSTRY_NAMES,
@@ -94,7 +95,7 @@ def plot_total_jobs_trend(data_type: str = "wac", save: bool = True):
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / f"total_jobs_trend_{data_type}.png"
+        filepath = GRAPHS_DESCRIPTIVE / f"total_jobs_trend_{data_type}.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -180,7 +181,7 @@ def plot_subgroup_bars(data_type: str = "wac", subgroup: str = "age", save: bool
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / f"bar_{subgroup}_{data_type}.png"
+        filepath = GRAPHS_DESCRIPTIVE / f"bar_{subgroup}_{data_type}.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -258,7 +259,7 @@ def plot_percent_change_grid(data_type: str = "wac", subgroup: str = "industry",
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / f"pctchg_{subgroup}_{data_type}.png"
+        filepath = GRAPHS_DESCRIPTIVE / f"pctchg_{subgroup}_{data_type}.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -294,7 +295,7 @@ def plot_did_coefficients(results_df: pd.DataFrame = None, save: bool = True):
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "did_coefficients.png"
+        filepath = GRAPHS_DESCRIPTIVE / "did_coefficients.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -308,7 +309,7 @@ def generate_all_visualizations(data_type: str = "wac"):
     print("=" * 60)
 
     # Create graphs directory if needed
-    GRAPHS_DIR.mkdir(parents=True, exist_ok=True)
+    GRAPHS_DESCRIPTIVE.mkdir(parents=True, exist_ok=True)
 
     # Total jobs trend
     print("\n1. Total jobs trend...")
@@ -338,7 +339,7 @@ def generate_all_visualizations(data_type: str = "wac"):
         print(f"   Skipped: {e}")
 
     print("\n" + "=" * 60)
-    print(f"Visualizations saved to {GRAPHS_DIR}")
+    print(f"Visualizations saved to {GRAPHS_DESCRIPTIVE}")
     print("=" * 60)
 
 

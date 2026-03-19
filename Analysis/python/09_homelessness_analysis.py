@@ -18,8 +18,8 @@ import numpy as np
 from pathlib import Path
 
 # Paths
-from config import GRAPHS_DIR, TABLES_DIR, ANALYSIS_DIR
-DATA_FILE = ANALYSIS_DIR / "data" / "2007-2024-PIT-Counts-by-CoC.xlsb"
+from config import GRAPHS_HOMELESSNESS, TABLES_DIR, ANALYSIS_DIR, DATA_REFERENCE_DIR
+DATA_FILE = DATA_REFERENCE_DIR / "2007-2024-PIT-Counts-by-CoC.xlsb"
 
 # Constants
 BUTTE_COC = "CA-519"  # Chico, Paradise/Butte County CoC
@@ -271,8 +271,8 @@ def main():
     print(f"  Saved: {output_csv}")
 
     # Create visualization
-    GRAPHS_DIR.mkdir(parents=True, exist_ok=True)
-    output_png = GRAPHS_DIR / "homelessness_pit_counts.png"
+    GRAPHS_HOMELESSNESS.mkdir(parents=True, exist_ok=True)
+    output_png = GRAPHS_HOMELESSNESS / "homelessness_pit_counts.png"
     plot_homelessness_trends(butte_df.copy(), ca_df.copy(), output_png)
 
     # Print summary statistics

@@ -17,7 +17,7 @@ import requests
 import gzip
 import shutil
 
-from config import DATA_DIR, GRAPHS_DIR, PARADISE_TRACTS, BUTTE_COUNTY_FIPS, YEARS
+from config import DATA_DIR, GRAPHS_COMMUTE, PARADISE_TRACTS, BUTTE_COUNTY_FIPS, YEARS
 
 # LODES OD data URL pattern
 LODES_OD_URL = "https://lehd.ces.census.gov/data/lodes/LODES8/ca/od/ca_od_main_JT00_{year}.csv.gz"
@@ -272,7 +272,7 @@ def plot_commute_patterns(residents_df: pd.DataFrame, workers_df: pd.DataFrame, 
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "commute_patterns.png"
+        filepath = GRAPHS_COMMUTE / "commute_patterns.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -314,7 +314,7 @@ def plot_live_work_balance(residents_df: pd.DataFrame, workers_df: pd.DataFrame,
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "live_work_balance.png"
+        filepath = GRAPHS_COMMUTE / "live_work_balance.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 

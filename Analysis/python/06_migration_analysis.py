@@ -13,7 +13,7 @@ import seaborn as sns
 from pathlib import Path
 import requests
 
-from config import DATA_DIR, GRAPHS_DIR
+from config import DATA_DIR, GRAPHS_MIGRATION
 
 # IRS SOI County Outflow URLs
 SOI_URLS = {
@@ -286,7 +286,7 @@ def plot_top_destinations_by_year(agg: pd.DataFrame, top_n: int = 10, save: bool
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "migration_top_destinations_by_year.png"
+        filepath = GRAPHS_MIGRATION / "migration_top_destinations_by_year.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -331,7 +331,7 @@ def plot_pre_post_comparison(comparison: pd.DataFrame, top_n: int = 15, save: bo
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "migration_pre_post_comparison.png"
+        filepath = GRAPHS_MIGRATION / "migration_pre_post_comparison.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -385,7 +385,7 @@ def plot_fire_year_spike(agg: pd.DataFrame, top_n: int = 10, save: bool = True):
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "migration_fire_year_spike.png"
+        filepath = GRAPHS_MIGRATION / "migration_fire_year_spike.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 
@@ -490,7 +490,7 @@ def plot_migration_by_region(outflows: pd.DataFrame, save: bool = True):
     plt.tight_layout()
 
     if save:
-        filepath = GRAPHS_DIR / "migration_by_region.png"
+        filepath = GRAPHS_MIGRATION / "migration_by_region.png"
         plt.savefig(filepath, dpi=150, bbox_inches="tight")
         print(f"Saved: {filepath}")
 

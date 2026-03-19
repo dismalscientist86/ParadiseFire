@@ -16,9 +16,25 @@ GRAPHS_DIR = ANALYSIS_DIR / "graphs"
 TABLES_DIR = ANALYSIS_DIR / "tables"
 PYTHON_DIR = ANALYSIS_DIR / "python"
 
+# Per-analysis graph subdirectories
+GRAPHS_DESCRIPTIVE  = GRAPHS_DIR / "descriptive"       # 04_visualizations.py
+GRAPHS_SYNTH        = GRAPHS_DIR / "synthetic_control" # 05_synthetic_control.py
+GRAPHS_MIGRATION    = GRAPHS_DIR / "migration"          # 06_migration_analysis.py
+GRAPHS_COMMUTE      = GRAPHS_DIR / "commute"            # 07_commute_analysis.py
+GRAPHS_SPILLOVER    = GRAPHS_DIR / "spillover"          # 08_spillover_analysis.py
+GRAPHS_HOMELESSNESS = GRAPHS_DIR / "homelessness"       # 09_homelessness_analysis.py
+
+# Reference data (maps, documentation)
+DATA_REFERENCE_DIR = ANALYSIS_DIR / "data" / "reference"
+
 # Create directories if they don't exist
-for dir_path in [DATA_DIR, GRAPHS_DIR, TABLES_DIR,
-                 DATA_DIR / "lodes_od", DATA_DIR / "lodes_rac", DATA_DIR / "lodes_wac"]:
+for dir_path in [
+    DATA_DIR, TABLES_DIR,
+    DATA_DIR / "lodes_od", DATA_DIR / "lodes_rac", DATA_DIR / "lodes_wac",
+    GRAPHS_DIR, GRAPHS_DESCRIPTIVE, GRAPHS_SYNTH, GRAPHS_MIGRATION,
+    GRAPHS_COMMUTE, GRAPHS_SPILLOVER, GRAPHS_HOMELESSNESS,
+    DATA_REFERENCE_DIR,
+]:
     try:
         dir_path.mkdir(parents=True, exist_ok=True)
     except OSError:
