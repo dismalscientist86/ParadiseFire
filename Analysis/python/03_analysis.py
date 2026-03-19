@@ -275,7 +275,7 @@ def run_full_did_analysis(data_type: str = "wac"):
         if var not in df.columns:
             continue
 
-        result = run_did_regression(df, var, controls)
+        result = run_did_regression(df, var, controls, cluster_col=tract_col)
         results.append({"name": name, **result})
 
         sig = ""
@@ -294,6 +294,7 @@ def run_full_did_analysis(data_type: str = "wac"):
     print("-" * 70)
     print("Significance: *** p<0.01, ** p<0.05, * p<0.1")
     print(f"Controls: {', '.join(controls) if controls else 'None'}")
+    print(f"Standard errors: clustered at census tract level")
 
     # Save results
     results_df = pd.DataFrame(results)
