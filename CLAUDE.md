@@ -14,12 +14,30 @@ ParadiseFire/
 ├── README.md
 ├── CLAUDE.md
 ├── Analysis/
-│   ├── data/           # Migration data, tract maps, supporting data
-│   ├── graphs/         # Generated visualizations (PNG, JPG)
-│   ├── programs/       # Stata do-files (legacy)
-│   ├── python/         # Python analysis scripts (recommended)
+│   ├── data/
+│   │   ├── reference/  # ButteCo_TractMap.pdf, HUD PIT xlsb, other reference files
+│   │   └── migration/  # Census and IRS migration source files
+│   ├── graphs/
+│   │   ├── descriptive/       # Bar charts, % change, DiD plot (04_visualizations.py)
+│   │   ├── synthetic_control/ # Synth control + placebo plots (05_synthetic_control.py)
+│   │   ├── migration/         # IRS SOI migration plots (06_migration_analysis.py)
+│   │   ├── commute/           # OD commute plots (07_commute_analysis.py)
+│   │   ├── spillover/         # Spillover + vacancy plots (08_spillover_analysis.py)
+│   │   ├── homelessness/      # PIT count plots (09_homelessness_analysis.py)
+│   │   └── _legacy/           # Old Stata-era graphs (archived, not regenerated)
+│   ├── programs/
+│   │   ├── [00-07_*.do]       # Active Stata scripts (legacy pipeline)
+│   │   ├── _legacy/           # Superseded/experimental Stata scripts
+│   │   └── logs/              # Stata run logs
+│   ├── python/
+│   │   ├── [01-09_*.py]       # Analysis scripts (run in order; see run_analysis.py)
+│   │   ├── config.py          # Paths and constants
+│   │   ├── utils.py           # Shared utilities (load_california_tract_data, etc.)
+│   │   ├── run_analysis.py    # Pipeline orchestrator for steps 01-04
+│   │   ├── requirements.txt
+│   │   └── _legacy/           # Superseded Python scripts
 │   └── tables/         # Output tables (CSV)
-├── GoogleEarth/        # Satellite imagery (Sept 2018, Dec 2018, May 2023)
+├── GoogleEarth/        # Satellite imagery (Sept 2018, Dec 2018, May 2023, damage map)
 ├── Notes/              # Project documentation
 └── Writeup/            # Paper/manuscript materials
 ```
