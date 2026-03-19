@@ -240,7 +240,7 @@ def plot_synthetic_control(results: pd.DataFrame, outcome_label: str = "Total Jo
     # Paradise vs Synthetic
     ax.plot(results["year"], results["paradise"], "o-", label="Paradise (Actual)", linewidth=2.5, markersize=8)
     ax.plot(results["year"], results["synthetic"], "s--", label="Synthetic Paradise", linewidth=2.5, markersize=8)
-    ax.axvline(x=2017.5, color="red", linestyle="--", alpha=0.7, linewidth=2, label="Camp Fire (Nov 2018)")
+    ax.axvline(x=2018.75, color="red", linestyle="--", alpha=0.7, linewidth=2, label="Camp Fire (Nov 2018)")
     ax.axhline(y=100, color="gray", linestyle=":", alpha=0.5, label="2017 Baseline")
     ax.set_xlabel("Year", fontsize=12)
     ax.set_ylabel(f"{outcome_label} Index (2017=100)", fontsize=12)
@@ -298,7 +298,7 @@ def plot_paradise_vs_donors(
             label="Paradise", zorder=3)
 
     # Add fire line
-    ax.axvline(x=2017.5, color="orange", linestyle="--", linewidth=2,
+    ax.axvline(x=2018.75, color="orange", linestyle="--", linewidth=2,
                alpha=0.8, label="Camp Fire (Nov 2018)", zorder=2)
 
     # Add baseline reference
@@ -404,7 +404,8 @@ def run_placebo_tests(
     placebo_tracts = np.random.choice(candidate_tracts, size=min(n_placebos, len(candidate_tracts)), replace=False)
 
     placebo_effects = []
-    placebo_rmses = []
+    placebo_pre_rmses = []
+    placebo_post_rmses = []
 
     print(f"\nRunning {len(placebo_tracts)} placebo tests...")
     for i, placebo_tract in enumerate(placebo_tracts):
@@ -443,16 +444,19 @@ def run_placebo_tests(
             synthetic_post = donors_post_mat.T @ weights
             gap_post = placebo_post - synthetic_post
             post_gap = gap_post.mean()
+            post_rmse = np.sqrt(np.mean(gap_post**2))
 
             effect = post_gap - pre_gap
 
             placebo_effects.append(effect)
-            placebo_rmses.append(pre_rmse)
+            placebo_pre_rmses.append(pre_rmse)
+            placebo_post_rmses.append(post_rmse)
         except Exception as e:
             continue
 
     placebo_effects = np.array(placebo_effects)
-    placebo_rmses = np.array(placebo_rmses)
+    placebo_rmses = np.array(placebo_pre_rmses)
+    placebo_post_rmses = np.array(placebo_post_rmses)
 
     # Filter to placebos with good pre-treatment fit (RMSE < 10)
     good_fit_mask = placebo_rmses < 10
@@ -483,12 +487,9 @@ def run_placebo_tests(
     paradise_rmspe_ratio = paradise_post_rmse / (paradise_pre_rmse + 0.1)  # Add small constant to avoid div by 0
 
     placebo_rmspe_ratios = []
-    for i, (eff, pre_rmse) in enumerate(zip(placebo_effects, placebo_rmses)):
+    for pre_rmse, post_rmse in zip(placebo_rmses, placebo_post_rmses):
         if pre_rmse < 10:  # Good pre-fit only
-            # Approximate post-RMSE from effect (effect ≈ post_gap, and we stored pre_rmse)
-            # This is an approximation; ideally we'd store post_rmse too
-            post_rmse_approx = abs(eff)  # Rough approximation
-            ratio = post_rmse_approx / (pre_rmse + 0.1)
+            ratio = post_rmse / (pre_rmse + 0.1)
             placebo_rmspe_ratios.append(ratio)
 
     placebo_rmspe_ratios = np.array(placebo_rmspe_ratios)
@@ -542,7 +543,8 @@ def run_placebo_tests(
     results_df = pd.DataFrame({
         "tract": placebo_tracts[:len(placebo_effects)],
         "effect": placebo_effects,
-        "pre_rmse": placebo_rmses
+        "pre_rmse": placebo_rmses,
+        "post_rmse": placebo_post_rmses,
     })
     results_df.to_csv(TABLES_DIR / f"placebo_results_{data_type}{suffix}.csv", index=False)
 
