@@ -7,7 +7,6 @@ tracts that best match Paradise's pre-fire characteristics.
 """
 import pandas as pd
 import numpy as np
-from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from pathlib import Path
 from config import (
@@ -17,6 +16,7 @@ from config import (
     PARADISE_TRACTS,
     BUTTE_COUNTY_FIPS,
 )
+from utils import load_california_tract_data, synthetic_control_weights
 
 # Pre-treatment years (before Nov 2018 fire)
 # Note: 2018 LODES is annual data and the Camp Fire was Nov 2018,
