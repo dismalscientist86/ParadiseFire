@@ -26,56 +26,6 @@ POST_YEARS = [2018, 2019, 2020, 2021, 2022, 2023]
 FIRE_YEAR = 2017  # last clean pre-treatment year
 
 
-def load_california_tract_data(data_type: str = "wac") -> pd.DataFrame:
-    """
-    Load and aggregate California LODES data to tract-year level.
-
-    This processes the raw CSV files to get all California tracts,
-    not just Butte County.
-    """
-    if data_type == "wac":
-        data_dir = DATA_DIR / "lodes_wac"
-        geocode_col = "w_geocode"
-    else:
-        data_dir = DATA_DIR / "lodes_rac"
-        geocode_col = "h_geocode"
-
-    all_data = []
-
-    for year in range(2013, 2024):
-        filepath = data_dir / f"ca_{data_type}_S000_JT00_{year}.csv"
-        if not filepath.exists():
-            print(f"  Skipping {year} - file not found")
-            continue
-
-        print(f"  Loading {year}...")
-        df = pd.read_csv(filepath, dtype={geocode_col: str})
-        df.columns = df.columns.str.lower()
-
-        # Ensure geocode is properly formatted
-        df[geocode_col] = df[geocode_col].str.zfill(15)
-
-        # Extract tract (11 digits)
-        tract_col = geocode_col.replace("geocode", "tract")
-        df[tract_col] = df[geocode_col].str[:11]
-
-        # Aggregate to tract level
-        count_cols = [c for c in df.columns if c.startswith('c') and c != 'createdate']
-        tract_agg = df.groupby(tract_col)[count_cols].sum().reset_index()
-        tract_agg["year"] = year
-
-        all_data.append(tract_agg)
-
-    result = pd.concat(all_data, ignore_index=True)
-
-    # Rename tract column consistently
-    if "w_tract" in result.columns:
-        result = result.rename(columns={"w_tract": "tract"})
-    elif "h_tract" in result.columns:
-        result = result.rename(columns={"h_tract": "tract"})
-
-    return result
-
 
 def prepare_synthetic_control_data(df: pd.DataFrame, outcome_var: str = "c000", normalize: bool = True):
     """
@@ -137,54 +87,6 @@ def prepare_synthetic_control_data(df: pd.DataFrame, outcome_var: str = "c000", 
 
     return paradise_df, donor_pivot
 
-
-def synthetic_control_weights(
-    treated_pre: np.ndarray,
-    donors_pre: np.ndarray,
-
-) -> np.ndarray:
-    """
-    Find optimal weights for synthetic control.
-
-    Minimizes the mean squared error between treated unit and
-    weighted combination of donors in pre-treatment period.
-
-    Parameters:
-    -----------
-    treated_pre : array (T_pre,) - Treated unit outcomes in pre-period
-    donors_pre : array (N_donors, T_pre) - Donor outcomes in pre-period
-
-    Returns:
-    --------
-    weights : array (N_donors,) - Optimal weights (sum to 1, non-negative)
-    """
-    n_donors = donors_pre.shape[0]
-
-    def objective(w):
-        """MSE between treated and synthetic control"""
-        synthetic = donors_pre.T @ w  # (T_pre,)
-        return np.mean((treated_pre - synthetic) ** 2)
-
-    # Constraints: weights sum to 1, non-negative
-    constraints = [
-        {"type": "eq", "fun": lambda w: np.sum(w) - 1},
-    ]
-    bounds = [(0, 1) for _ in range(n_donors)]
-
-    # Initial guess: equal weights
-    w0 = np.ones(n_donors) / n_donors
-
-    # Optimize
-    result = minimize(
-        objective,
-        w0,
-        method="SLSQP",
-        bounds=bounds,
-        constraints=constraints,
-        options={"maxiter": 1000, "ftol": 1e-10}
-    )
-
-    return result.x
 
 
 def run_synthetic_control(
