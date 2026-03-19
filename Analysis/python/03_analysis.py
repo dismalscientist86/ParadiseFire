@@ -128,9 +128,10 @@ def create_control_variables(df: pd.DataFrame, geocode_col: str, base_year: int 
         if "ca02" in base_data.columns:
             base_data["age_pwork"] = base_data["ca02"] / base_data["c000"]
 
-        # Proportion high school or more
+        # Proportion high school through some college (cd02=HS, cd03=some college/AA)
+        # Note: excludes cd04 (bachelor's+), which is captured by ed_college below
         if all(col in base_data.columns for col in ["cd02", "cd03", "c000"]):
-            base_data["ed_hsplus"] = (base_data["cd02"] + base_data["cd03"]) / base_data["c000"]
+            base_data["ed_hs_some_college"] = (base_data["cd02"] + base_data["cd03"]) / base_data["c000"]
 
         # Proportion college educated
         if "cd04" in base_data.columns:
@@ -141,7 +142,7 @@ def create_control_variables(df: pd.DataFrame, geocode_col: str, base_year: int 
             base_data["p_female"] = base_data["cs02"] / base_data["c000"]
 
     # Merge control variables back to main data
-    control_cols = ["age_pwork", "ed_hsplus", "ed_college", "p_female"]
+    control_cols = ["age_pwork", "ed_hs_some_college", "ed_college", "p_female"]
     control_cols = [col for col in control_cols if col in base_data.columns]
 
     if control_cols:
@@ -155,7 +156,9 @@ def create_control_variables(df: pd.DataFrame, geocode_col: str, base_year: int 
     return result
 
 
-def run_did_regression(df: pd.DataFrame, outcome: str, controls: list = None) -> dict:
+def run_did_regression(
+    df: pd.DataFrame, outcome: str, controls: list = None, cluster_col: str = None
+) -> dict:
     """
     Run difference-in-differences regression.
 
@@ -167,6 +170,9 @@ def run_did_regression(df: pd.DataFrame, outcome: str, controls: list = None) ->
         Outcome variable name
     controls : list, optional
         Control variable names
+    cluster_col : str, optional
+        Column to cluster standard errors on (e.g. census tract). If None,
+        falls back to HC1 heteroskedasticity-robust SEs.
 
     Returns:
     --------
@@ -178,7 +184,12 @@ def run_did_regression(df: pd.DataFrame, outcome: str, controls: list = None) ->
         formula += " + " + " + ".join(controls)
 
     try:
-        model = smf.ols(formula, data=df).fit(cov_type="HC1")  # Robust standard errors
+        if cluster_col and cluster_col in df.columns:
+            model = smf.ols(formula, data=df).fit(
+                cov_type="cluster", cov_kwds={"groups": df[cluster_col]}
+            )
+        else:
+            model = smf.ols(formula, data=df).fit(cov_type="HC1")
 
         return {
             "outcome": outcome,
@@ -228,6 +239,10 @@ def run_full_did_analysis(data_type: str = "wac"):
     # Prepare DiD data
     df = prepare_did_data(df)
 
+    # Add census tract for clustering (first 11 digits of 15-digit block geocode)
+    tract_col = "tract"
+    df[tract_col] = df[geocode_col].str[:11]
+
     # Add control variables
     df = create_control_variables(df, geocode_col)
 
@@ -245,7 +260,7 @@ def run_full_did_analysis(data_type: str = "wac"):
         "High Earnings": "ce03",
     }
 
-    controls = ["age_pwork", "ed_hsplus", "ed_college", "p_female"]
+    controls = ["age_pwork", "ed_hs_some_college", "ed_college", "p_female"]
     controls = [c for c in controls if c in df.columns]
 
     results = []
